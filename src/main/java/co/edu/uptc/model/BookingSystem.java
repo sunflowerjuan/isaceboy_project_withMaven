@@ -35,6 +35,11 @@ public class BookingSystem {
         return persistence.findCustomer(id);
     }
 
+    public List<Customer> findAllCustomers() {
+        customers = persistence.findAllCustomers();
+        return customers;
+    }
+
     public boolean deleteCustomer(String id) {
         try {
             persistence.deleteCustomer(id);
@@ -76,6 +81,7 @@ public class BookingSystem {
     }
 
     public List<Room> findAllRooms() {
+
         return persistence.findAllRooms();
     }
 

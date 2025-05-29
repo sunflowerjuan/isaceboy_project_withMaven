@@ -1,7 +1,6 @@
 package co.edu.uptc.model;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,7 +8,6 @@ import javax.persistence.Id;
 public class Customer implements Serializable {
     @Id
     private String identification;
-    @Basic
     private String name;
     private String lastName;
     private String address;

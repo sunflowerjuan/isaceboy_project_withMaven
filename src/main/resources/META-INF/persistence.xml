@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence           http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+<persistence version="2.2"
+  xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+
   <persistence-unit name="co.edu.uptc_isaceboy_project_PU" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
     <class>co.edu.uptc.model.Booking</class>
-    <class>co.edu.uptc.model.Room</class>
     <class>co.edu.uptc.model.Customer</class>
+    <class>co.edu.uptc.model.Room</class>
+
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/isaceboy?serverTimezone=UTC"/>
-      <property name="javax.persistence.jdbc.user" value="root"/>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.password" value="102210"/>
-      <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
-      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <!-- Configuración JDBC -->
+      <property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:reservas.db"/>
+      <property name="javax.persistence.jdbc.user" value=""/>
+      <property name="javax.persistence.jdbc.password" value=""/>
+
+      <!-- Dialecto personalizado para SQLite -->
+      <property name="hibernate.dialect" value="co.edu.uptc.persistence.dialect.SQLiteDialect"/>
+
+      <!-- Generación de esquema -->
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+      <!-- Mostrar SQL en consola (opcional) -->
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.format_sql" value="true"/>
     </properties>
+
   </persistence-unit>
 </persistence>

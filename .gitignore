@@ -1,3 +1,4 @@
 #ignore file for a Rust project
 target/
 .vscode/
+.idea/

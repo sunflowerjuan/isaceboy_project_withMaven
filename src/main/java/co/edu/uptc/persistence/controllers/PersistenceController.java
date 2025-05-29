@@ -48,6 +48,10 @@ public class PersistenceController {
         return customerJpaController.findCustomerEntities();
     }
 
+    public int countCustomers() {
+        return customerJpaController.getCustomerCount();
+    }
+
     // CRUD operations for Room
 
     public boolean createRoom(Room room) {
@@ -74,6 +78,10 @@ public class PersistenceController {
 
     public List<Room> findAllRooms() {
         return roomJpaController.findRoomEntities();
+    }
+
+    public int countRooms() {
+        return roomJpaController.getRoomCount();
     }
 
     // CRUD operations for Booking
@@ -106,6 +114,10 @@ public class PersistenceController {
 
     public List<Booking> findBookingsByRoomType(RoomType roomType) {
         return bookingJpaController.findBookingsByRoomType(roomType);
+    }
+
+    public int countBookings() {
+        return bookingJpaController.getBookingCount();
     }
 
 }

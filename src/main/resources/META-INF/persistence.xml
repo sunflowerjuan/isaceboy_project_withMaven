@@ -14,7 +14,7 @@
     <properties>
       <!-- Configuración JDBC -->
       <property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:reservas.db"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:iasceboy_bookings.db"/>
       <property name="javax.persistence.jdbc.user" value=""/>
       <property name="javax.persistence.jdbc.password" value=""/>
 

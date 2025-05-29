@@ -44,8 +44,6 @@ src/
 
 ### 📝 `LICENSE` file (MIT)
 
-You should also include a `LICENSE` file in your project root with the following content:
-
 ```text
 MIT License
 

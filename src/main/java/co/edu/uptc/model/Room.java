@@ -11,7 +11,7 @@ public class Room {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
     private int id;
-    private String roomNumber;
+
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private int numberOfRooms;
@@ -20,19 +20,10 @@ public class Room {
     public Room() {
     }
 
-    public Room(String roomNumber, RoomType roomType, int numberOfRooms, double pricePerNight) {
-        this.roomNumber = roomNumber;
+    public Room(RoomType roomType, int numberOfRooms, double pricePerNight) {
         this.roomType = roomType;
         this.numberOfRooms = numberOfRooms;
         this.pricePerNight = pricePerNight;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
     }
 
     public RoomType getRoomType() {
@@ -57,6 +48,14 @@ public class Room {
 
     public void setPricePerNight(double pricePerNight) {
         this.pricePerNight = pricePerNight;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
 }

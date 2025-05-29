@@ -7,8 +7,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
+import javax.persistence.TemporalType;
+
+import java.util.Date;
 
 import co.edu.uptc.model.Booking;
+import co.edu.uptc.model.RoomType;
 import co.edu.uptc.persistence.exceptions.NonexistentEntityException;
 
 public class BookingJpaController implements Serializable {
@@ -109,6 +113,19 @@ public class BookingJpaController implements Serializable {
                 q.setFirstResult(firstResult);
             }
             return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Booking> findBookingsByRoomType(RoomType roomType) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT b FROM Booking b WHERE b.room.roomType = :roomType AND b.startDate >= :today";
+            return em.createQuery(jpql, Booking.class)
+                    .setParameter("roomType", roomType)
+                    .setParameter("today", new Date(), TemporalType.DATE)
+                    .getResultList();
         } finally {
             em.close();
         }

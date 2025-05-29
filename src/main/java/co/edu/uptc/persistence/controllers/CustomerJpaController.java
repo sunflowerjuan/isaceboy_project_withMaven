@@ -4,6 +4,7 @@ package co.edu.uptc.persistence.controllers;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
@@ -31,6 +32,8 @@ public class CustomerJpaController implements Serializable {
             em.getTransaction().begin();
             em.persist(customer);
             em.getTransaction().commit();
+        } catch (Exception e) {
+            throw new EntityExistsException("The customer with id " + customer.getIdentification() + " alredy exists.");
         } finally {
             if (em != null) {
                 em.close();
@@ -47,7 +50,7 @@ public class CustomerJpaController implements Serializable {
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
+            if (msg == null || msg.isEmpty()) {
                 String id = customer.getIdentification();
                 if (findCustomer(id) == null) {
                     throw new NonexistentEntityException("The customer with id " + id + " no longer exists.");

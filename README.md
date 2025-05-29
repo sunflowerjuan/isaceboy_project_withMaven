@@ -49,7 +49,7 @@ You should also include a `LICENSE` file in your project root with the following
 ```text
 MIT License
 
-Copyright (c) 2025 Juan Sebastian
+Copyright (c) 2025 sunflowerjuan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

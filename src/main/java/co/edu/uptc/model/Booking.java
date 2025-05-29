@@ -1,21 +1,21 @@
 package co.edu.uptc.model;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
 public class Booking implements Serializable {
     @Id
-    @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
     private int bookingId;
+    @ManyToOne
     private Customer customer;
+    @ManyToOne
     private Room room;
     @Temporal(TemporalType.DATE)
     private Date startDate;

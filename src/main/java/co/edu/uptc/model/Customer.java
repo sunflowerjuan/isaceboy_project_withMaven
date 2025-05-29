@@ -1,12 +1,15 @@
 package co.edu.uptc.model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
 public class Customer implements Serializable {
     @Id
+    @Column(name = "identification", nullable = false, unique = true)
     private String identification;
     private String name;
     private String lastName;

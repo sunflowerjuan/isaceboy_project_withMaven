@@ -1,17 +1,17 @@
 package co.edu.uptc.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 
 @Entity
-public class Room {
+public class Room implements Serializable {
     @Id
-    @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
     private int id;
-
+    private String roomNumber;
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private int numberOfRooms;
@@ -20,10 +20,27 @@ public class Room {
     public Room() {
     }
 
-    public Room(RoomType roomType, int numberOfRooms, double pricePerNight) {
+    public Room(String roomNumber, RoomType roomType, int numberOfRooms, double pricePerNight) {
+        this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.numberOfRooms = numberOfRooms;
         this.pricePerNight = pricePerNight;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
     public RoomType getRoomType() {
@@ -48,14 +65,6 @@ public class Room {
 
     public void setPricePerNight(double pricePerNight) {
         this.pricePerNight = pricePerNight;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
 }

@@ -2,4 +2,4 @@
 target/
 .vscode/
 .idea/
-/reservas.db
+/iasceboy_bookings.db

@@ -2,6 +2,7 @@ package co.edu.uptc.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,17 +18,17 @@ public class Booking implements Serializable {
     private Customer customer;
     private Room room;
     @Temporal(TemporalType.DATE)
-    private LocalDate startDate;
+    private Date startDate;
     @Temporal(TemporalType.DATE)
-    private LocalDate endDate;
+    private Date endDate;
     private double totalPrice;
     private boolean isActive;
 
     public Booking() {
     }
 
-    public Booking(int bookingId, Customer customer, Room room, LocalDate startDate, LocalDate endDate,
-            double totalPrice, boolean isActive) {
+    public Booking(int bookingId, Customer customer, Room room, Date startDate, Date endDate, double totalPrice,
+            boolean isActive) {
         this.bookingId = bookingId;
         this.customer = customer;
         this.room = room;
@@ -61,19 +62,19 @@ public class Booking implements Serializable {
         this.room = room;
     }
 
-    public LocalDate getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

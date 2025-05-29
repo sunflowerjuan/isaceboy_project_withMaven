@@ -1,7 +1,15 @@
 package co.edu.uptc.model;
 
-public class Customer {
+import java.io.Serializable;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class Customer implements Serializable {
+    @Id
     private String identification;
+    @Basic
     private String name;
     private String lastName;
     private String address;

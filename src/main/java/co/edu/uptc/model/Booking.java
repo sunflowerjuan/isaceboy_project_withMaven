@@ -1,12 +1,25 @@
 package co.edu.uptc.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Booking {
-    private String bookingId;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+
+@Entity
+public class Booking implements Serializable {
+    @Id
+    @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+    private int bookingId;
     private Customer customer;
     private Room room;
+    @Temporal(TemporalType.DATE)
     private LocalDate startDate;
+    @Temporal(TemporalType.DATE)
     private LocalDate endDate;
     private double totalPrice;
     private boolean isActive;
@@ -14,7 +27,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(String bookingId, Customer customer, Room room, LocalDate startDate, LocalDate endDate,
+    public Booking(int bookingId, Customer customer, Room room, LocalDate startDate, LocalDate endDate,
             double totalPrice, boolean isActive) {
         this.bookingId = bookingId;
         this.customer = customer;
@@ -25,11 +38,11 @@ public class Booking {
         this.isActive = isActive;
     }
 
-    public String getBookingId() {
+    public int getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(String bookingId) {
+    public void setBookingId(int bookingId) {
         this.bookingId = bookingId;
     }
 

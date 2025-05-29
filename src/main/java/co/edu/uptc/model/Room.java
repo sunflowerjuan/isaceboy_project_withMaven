@@ -3,13 +3,16 @@ package co.edu.uptc.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 
 @Entity
 public class Room {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
     private int id;
     private String roomNumber;
+    @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private int numberOfRooms;
     private double pricePerNight;

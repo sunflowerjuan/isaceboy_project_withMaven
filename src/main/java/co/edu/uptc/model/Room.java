@@ -11,7 +11,6 @@ import javax.persistence.Id;
 public class Room implements Serializable {
     @Id
     private int id;
-    private String roomNumber;
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private int numberOfRooms;
@@ -20,8 +19,7 @@ public class Room implements Serializable {
     public Room() {
     }
 
-    public Room(String roomNumber, RoomType roomType, int numberOfRooms, double pricePerNight) {
-        this.roomNumber = roomNumber;
+    public Room(RoomType roomType, int numberOfRooms, double pricePerNight) {
         this.roomType = roomType;
         this.numberOfRooms = numberOfRooms;
         this.pricePerNight = pricePerNight;
@@ -33,14 +31,6 @@ public class Room implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
     }
 
     public RoomType getRoomType() {

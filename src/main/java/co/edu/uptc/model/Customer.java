@@ -88,4 +88,10 @@ public class Customer implements Serializable {
         this.balance = balance;
     }
 
+    @Override
+    public String toString() {
+        return "Customer [identification=" + identification + ", name=" + name + ", lastName=" + lastName + ", address="
+                + address + ", email=" + email + ", phoneNumber=" + phoneNumber + ", balance=" + balance + "]";
+    }
+
 }

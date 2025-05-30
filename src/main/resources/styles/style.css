@@ -1,0 +1,18 @@
+.titled-pane-custom > .title {
+  -fx-background-color: #ebebeb; /* SECONDARY_COLOR */
+  -fx-background-radius: 5 0 0 5;
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-text-fill: black;
+  -fx-padding: 10;
+  -fx-border-insets: 0;
+  -fx-background-insets: 0;
+}
+
+.titled-pane-custom {
+  -fx-border-color: transparent;
+}
+.titled-pane-selected > .title {
+  -fx-background-color: #547792; /* PRIMARY_COLOR */
+  -fx-text-fill: white;
+}

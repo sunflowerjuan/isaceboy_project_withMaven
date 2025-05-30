@@ -19,65 +19,47 @@ public class LateralMenu {
 
     private VBox menuBox;
     private Consumer<Region> onPanelSelected;
+    private MainView mainView;
 
-    public LateralMenu() {
+    public LateralMenu(MainView mainView) {
+        this.mainView = mainView;
         menuBox = new VBox(20);
         menuBox.setPadding(new Insets(20, -1, 20, 20));
         menuBox.setStyle("-fx-background-color: " + ViewStyles.PRIMARY_COLOR + ";");
         menuBox.setPrefWidth(300);
         menuBox.setAlignment(Pos.TOP_LEFT);
 
-        // Logo e Identificación
+        VBox headerBox = createHeader();
+        Accordion menu = createMenu();
+        Button closeBtn = createCloseButton();
+
+        menuBox.getChildren().addAll(headerBox, menu, closeBtn);
+    }
+
+    private VBox createHeader() {
         ImageView logoView = new ImageView(new Image("file:src/main/resources/images/logo.png"));
         logoView.setFitHeight(200);
         logoView.setPreserveRatio(true);
 
-        Label titulo = new Label("IASCEBOY");
-        ViewStyles.titleStyle(titulo);
+        Label title = new Label("IASCEBOY");
+        ViewStyles.titleStyle(title);
 
         Label subtitle = new Label("SISTEMA GESTOR DE RESERVAS");
         ViewStyles.subtitleStyle(subtitle);
 
-        VBox headerBox = new VBox(5, logoView, titulo, subtitle);
+        VBox headerBox = new VBox(5, logoView, title, subtitle);
         headerBox.setAlignment(Pos.CENTER);
+        return headerBox;
+    }
 
-        // Reservas
-        Button crearReserva = new Button("Crear Reserva");
-        ViewStyles.buttonStyle(crearReserva);
-        crearReserva.setOnAction(e -> notificarCambio(new BookingPane()));
+    private Accordion createMenu() {
+        TitledPane bookingTitled = createBookingPane();
+        TitledPane customerTitled = createHuespedesPane();
+        TitledPane roomTitled = createHabitacionesPane();
 
-        Button verReservas = new Button("Ver Reservas");
-        ViewStyles.buttonStyle(verReservas);
-        verReservas.setOnAction(e -> notificarCambio(new ShowBookingPane()));
-
-        VBox reservasBox = new VBox(5, crearReserva, verReservas);
-        TitledPane reservasPane = new TitledPane("Reservas", reservasBox);
-        ViewStyles.titledPane(reservasPane);
-
-        // Huéspedes
-        Button registrarHuesped = new Button("Registrar Huésped");
-        ViewStyles.buttonStyle(registrarHuesped);
-        registrarHuesped.setOnAction(e -> notificarCambio(new CustomerPane()));
-
-        Button gestionarHuesped = new Button("Gestionar Huésped");
-        ViewStyles.buttonStyle(gestionarHuesped);
-        gestionarHuesped.setOnAction(e -> notificarCambio(new CustomerSuggestPane()));
-
-        VBox huespedesBox = new VBox(5, registrarHuesped, gestionarHuesped);
-        TitledPane huespedesPane = new TitledPane("Huéspedes", huespedesBox);
-        ViewStyles.titledPane(huespedesPane);
-
-        // Habitaciones
-        Button verHabitaciones = new Button("Panel de Habitaciones");
-        ViewStyles.buttonStyle(verHabitaciones);
-        verHabitaciones.setOnAction(e -> notificarCambio(new RoomPane()));
-
-        VBox habitacionesBox = new VBox(verHabitaciones);
-        TitledPane habitacionesPane = new TitledPane("Habitaciones", habitacionesBox);
-        ViewStyles.titledPane(habitacionesPane);
-
-        Accordion menu = new Accordion(reservasPane, huespedesPane, habitacionesPane);
+        Accordion menu = new Accordion(bookingTitled, customerTitled, roomTitled);
         VBox.setVgrow(menu, Priority.ALWAYS);
+
         menu.expandedPaneProperty().addListener((obs, oldPane, newPane) -> {
             if (oldPane != null) {
                 oldPane.getStyleClass().remove("titled-pane-selected");
@@ -86,13 +68,55 @@ public class LateralMenu {
                 newPane.getStyleClass().add("titled-pane-selected");
             }
         });
+        return menu;
+    }
 
-        // Botón de cerrar
+    private TitledPane createBookingPane() {
+        Button createBooking = new Button("Crear Reserva");
+        ViewStyles.buttonStyle(createBooking);
+        createBooking.setOnAction(e -> notifyChange(mainView.getBookingPane()));
+
+        Button showBooking = new Button("Ver Reservas");
+        ViewStyles.buttonStyle(showBooking);
+        showBooking.setOnAction(e -> notifyChange(mainView.getShowBookingPane()));
+
+        VBox reservasBox = new VBox(5, createBooking, showBooking);
+        TitledPane pane = new TitledPane("Reservas", reservasBox);
+        ViewStyles.titledPane(pane);
+        return pane;
+    }
+
+    private TitledPane createHuespedesPane() {
+        Button registrarHuesped = new Button("Registrar Huésped");
+        ViewStyles.buttonStyle(registrarHuesped);
+        registrarHuesped.setOnAction(e -> notifyChange(new CustomerPane()));
+
+        Button gestionarHuesped = new Button("Gestionar Huésped");
+        ViewStyles.buttonStyle(gestionarHuesped);
+        gestionarHuesped.setOnAction(e -> notifyChange(new CustomerSuggestPane()));
+
+        VBox huespedesBox = new VBox(5, registrarHuesped, gestionarHuesped);
+        TitledPane pane = new TitledPane("Huéspedes", huespedesBox);
+        ViewStyles.titledPane(pane);
+        return pane;
+    }
+
+    private TitledPane createHabitacionesPane() {
+        Button verHabitaciones = new Button("Panel de Habitaciones");
+        ViewStyles.buttonStyle(verHabitaciones);
+        verHabitaciones.setOnAction(e -> notifyChange(new RoomPane()));
+
+        VBox habitacionesBox = new VBox(verHabitaciones);
+        TitledPane pane = new TitledPane("Habitaciones", habitacionesBox);
+        ViewStyles.titledPane(pane);
+        return pane;
+    }
+
+    private Button createCloseButton() {
         Button cerrarBtn = new Button("Cerrar");
         ViewStyles.closeBtnStyle(cerrarBtn);
         cerrarBtn.setOnAction(e -> System.exit(0));
-
-        menuBox.getChildren().addAll(headerBox, menu, cerrarBtn);
+        return cerrarBtn;
     }
 
     public VBox getMenu() {
@@ -103,7 +127,7 @@ public class LateralMenu {
         this.onPanelSelected = listener;
     }
 
-    private void notificarCambio(Region panel) {
+    private void notifyChange(Region panel) {
         if (onPanelSelected != null) {
             onPanelSelected.accept(panel);
         }

@@ -12,7 +12,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.getIcons().add(new Image("file:src/main/resources/images/IASCEBOY.jpg"));
-        MainView mainView = new MainView();
+        MainView mainView = new MainView(primaryStage);
         Scene scene = new Scene(mainView.getRoot(), 1200, 800);
         scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
 

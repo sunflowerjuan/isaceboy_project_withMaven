@@ -81,6 +81,15 @@ public class BookingSystem {
         return persistence.findRoom(id);
     }
 
+    public Room findRoom(RoomType roomType) {
+        for (Room room : findAllRooms()) {
+            if (room.getRoomType().equals(roomType)) {
+                return room;
+            }
+        }
+        return null;
+    }
+
     public boolean deleteRoom(int id) {
         try {
             persistence.deleteRoom(id);

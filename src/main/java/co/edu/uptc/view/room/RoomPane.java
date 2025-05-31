@@ -1,9 +1,9 @@
 package co.edu.uptc.view.room;
 
+import co.edu.uptc.model.RoomType;
 import co.edu.uptc.presenter.Presenter;
 import co.edu.uptc.view.rootstyles.DialogMessage;
 import co.edu.uptc.view.rootstyles.ViewStyles;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class RoomPane extends VBox {
-    private ComboBox<String> roomTypeCombo;
+    private ComboBox<RoomType> roomTypeCombo;
     private TextField roomCountField;
     private TextField priceField;
     private Button updateButton;
@@ -69,14 +69,18 @@ public class RoomPane extends VBox {
 
     private void createRoomTypeCombo() {
         roomTypeCombo = new ComboBox<>();
-        roomTypeCombo.getItems().addAll("Sencilla", "Doble", "Suite");
         roomTypeCombo.setPrefWidth(350);
         roomTypeCombo.setPrefHeight(40);
         roomTypeCombo.setPromptText("Seleccione tipo...");
         ViewStyles.comboStyle(roomTypeCombo);
 
+        // Cargar los valores del enum desde el presentador
+        roomTypeCombo.getItems().addAll(presenter.getRoomTypes());
+
         roomTypeCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            loadRoomInfo(newVal);
+            if (newVal != null) {
+                loadRoomInfo(newVal);
+            }
         });
     }
 
@@ -116,16 +120,28 @@ public class RoomPane extends VBox {
         updateButton.setDisable(true);
         ViewStyles.buttonStyle(updateButton, 650, 60);
         updateButton.setOnAction(e -> {
+            if (roomCountField.getText().isEmpty()) {
+                DialogMessage.showWarningDialog(stage,
+                        "Debe seleccionar un tipo de habitación con información válida.");
+                clean();
+                return;
+            }
+
             if (validatePrice()) {
-                // Lógica para actualizar el precio
-                presenter.updateRoomPrice();
+                String strPrice = priceField.getText()
+                        .replaceAll("\\$", "")
+                        .replaceAll("\\.", "")
+                        .trim();
+                presenter.updateRoomPrice(strPrice, roomTypeCombo.getValue());
                 DialogMessage.showSuccessDialog(stage, "Precio actualizado correctamente");
                 previousPrice = priceField.getText();
                 updateButton.setDisable(true);
             } else {
                 DialogMessage.showWarningDialog(stage, "Ingrese un precio válido");
+                clean();
             }
         });
+
     }
 
     private boolean validatePrice() {
@@ -174,13 +190,26 @@ public class RoomPane extends VBox {
         return "$" + sb;
     }
 
-    private void loadRoomInfo(String roomType) {
-        // Simula una carga de información, reemplazar por lógica real
-        roomCountField.setText("10");
-        String defaultPrice = "$150.000";
-        priceField.setText(defaultPrice);
-        previousPrice = defaultPrice;
-        updateButton.setDisable(true);
-        priceError.setVisible(false);
+    private void loadRoomInfo(RoomType roomType) {
+        String[] info = presenter.getRoomInfo(roomType);
+        if (info != null && info.length == 2) {
+            String count = info[0];
+            String rawPrice = info[1];
+
+            roomCountField.setText(count);
+            String formattedPrice = formatCurrency(rawPrice);
+            priceField.setText(formattedPrice);
+            previousPrice = formattedPrice;
+            updateButton.setDisable(true);
+            priceError.setVisible(false);
+        } else {
+            DialogMessage.showWarningDialog(stage, "No se encontró información para la habitación seleccionada.");
+            clean();
+        }
     }
+
+    public void clean() {
+        priceField.setText("");
+    }
+
 }

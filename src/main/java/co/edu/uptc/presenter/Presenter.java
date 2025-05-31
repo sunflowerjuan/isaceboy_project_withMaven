@@ -1,10 +1,14 @@
 package co.edu.uptc.presenter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import co.edu.uptc.model.BookingSystem;
 import co.edu.uptc.model.Customer;
+import co.edu.uptc.model.Room;
+import co.edu.uptc.model.RoomType;
 import co.edu.uptc.view.MainView;
 
 public class Presenter {
@@ -80,8 +84,29 @@ public class Presenter {
         return results;
     }
 
-    public void updateRoomPrice() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateRoomPrice'");
+    public String[] getRoomInfo(RoomType roomType) {
+        Room room = bookingSystem.findRoom(roomType);
+        if (room != null) {
+            String[] roomInfo = new String[2];
+            DecimalFormat df = new DecimalFormat("0");
+            df.setGroupingUsed(false); // evita comas o puntos como separadores de miles
+            roomInfo[0] = String.valueOf(room.getNumberOfRooms());
+            roomInfo[1] = df.format(room.getPricePerNight());
+            System.out.println(roomInfo[1]);
+            return roomInfo;
+        }
+        return null;
     }
+
+    public List<RoomType> getRoomTypes() {
+        return Arrays.asList(RoomType.values());
+    }
+
+    public void updateRoomPrice(String strPrice, RoomType roomType) {
+        double price = Double.parseDouble(strPrice);
+        Room room = bookingSystem.findRoom(roomType);
+        room.setPricePerNight(price);
+        bookingSystem.updateRoom(room);
+    }
+
 }

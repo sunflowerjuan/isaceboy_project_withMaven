@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -14,8 +15,10 @@ public class Booking implements Serializable {
     @Id
     private int bookingId;
     @ManyToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "identification", nullable = false)
     private Customer customer;
     @ManyToOne
+    @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
     private Room room;
     @Temporal(TemporalType.DATE)
     private Date startDate;

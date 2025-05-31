@@ -40,6 +40,16 @@ public class BookingSystem {
         return customers;
     }
 
+    public List<Customer> findCustomersByIdPartial(String query) {
+        List<Customer> results = new ArrayList<>();
+        for (Customer customer : findAllCustomers()) {
+            if (customer.getIdentification().contains(query)) {
+                results.add(customer);
+            }
+        }
+        return results;
+    }
+
     public boolean deleteCustomer(String id) {
         try {
             persistence.deleteCustomer(id);

@@ -78,7 +78,7 @@ public class CustomerPane extends VBox {
         VBox.setVgrow(spacer, Priority.ALWAYS);
         getChildren().addAll(contentBox, spacer, saveButton);
         setAlignment(Pos.TOP_CENTER);
-        VBox.setVgrow(this, Priority.ALWAYS); // Asegura que el pane principal crezca bien
+        VBox.setVgrow(this, Priority.ALWAYS);
 
     }
 

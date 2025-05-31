@@ -50,7 +50,7 @@ public class MainView {
         showBookingPane = new ShowBookingPane();
         customerPane = new CustomerPane(presenter, stage);
         customerSuggestPane = new CustomerSuggest(presenter, stage);
-        roomPane = new RoomPane();
+        roomPane = new RoomPane(presenter, stage);
     }
 
     public void setupView() {
@@ -83,7 +83,7 @@ public class MainView {
         toggleTab.setOnMouseClicked(e -> toggleMenu());
     }
 
-    private void toggleMenu() {
+    public void toggleMenu() {
         isMenuVisible = !isMenuVisible;
         if (isMenuVisible) {
             root.setLeft(new HBox(menu.getMenu(), toggleTab));

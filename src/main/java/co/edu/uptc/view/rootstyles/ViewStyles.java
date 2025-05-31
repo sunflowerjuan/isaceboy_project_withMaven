@@ -1,6 +1,7 @@
 package co.edu.uptc.view.rootstyles;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -18,6 +19,7 @@ public class ViewStyles {
         public static final String ALERT_COLOR = "rgb(139, 70, 62)";
         public static final String ALERT_COLOR_HOVER = "rgb(61, 27, 23)";
         public static final String ERROR_COLOR = "#d9534f";
+        public static final String ENABLE_COLOR = "#4a90e2";
 
         // Títulos
         public static void titleStyle(Label label) {
@@ -57,9 +59,19 @@ public class ViewStyles {
 
         // Estilo para campos de texto
         public static void textFieldStyle(TextField field) {
-                field.setStyle("-fx-background-color: c2c2c2;"
+                field.setStyle("-fx-background-color: fafafa;"
+                                + " -fx-border-color: " + ENABLE_COLOR + ";"
+                                + " -fx-border-radius: 5;"
+                                + " -fx-background-radius: 5;"
+                                + " -fx-padding: 5;"
+                                + " -fx-font-size: 18px;");
+        }
+
+        // Estilo para campos de texto
+        public static void textFieldNoEdStyle(TextField field) {
+                field.setStyle("-fx-background-color: fcfcfc;"
                                 + " -fx-border-color: " + PRIMARY_COLOR + ";"
-                                + " -fx-border-radius: 6;"
+                                + " -fx-border-radius: 5;"
                                 + " -fx-background-radius: 5;"
                                 + " -fx-padding: 5;"
                                 + " -fx-font-size: 18px;");
@@ -98,7 +110,7 @@ public class ViewStyles {
                                 + " -fx-font-weight: bold;"
                                 + " -fx-background-radius: 10;");
                 button.setPrefHeight(heightValue);
-                button.setMaxWidth(widthValue);
+                button.setPrefWidth(widthValue);
 
                 button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + THIRD_COLOR + ";"
                                 + " -fx-text-fill: " + PRIMARY_COLOR + ";"
@@ -174,5 +186,25 @@ public class ViewStyles {
                 button.setOnMouseExited(e -> button.setStyle(baseStyle));
 
                 return button;
+        }
+
+        public static void comboStyle(ComboBox<?> comboBox) {
+                comboBox.setStyle("-fx-background-color: " + WITHE_COLOR + ";"
+                                + "-fx-border-color: " + ENABLE_COLOR + ";"
+                                + "-fx-border-radius: 5;"
+                                + "-fx-background-radius: 5;"
+                                + "-fx-padding: 5;"
+                                + "-fx-font-size: 16px;"
+                                + "-fx-text-fill: " + BLACK_COLOR + ";");
+
+                comboBox.setOnMouseEntered(e -> comboBox.setStyle("-fx-background-color: " + HOVER_COLOR + ";"
+                                + "-fx-border-color: " + ENABLE_COLOR + ";"
+                                + "-fx-border-radius: 5;"
+                                + "-fx-background-radius: 5;"
+                                + "-fx-padding: 5;"
+                                + "-fx-font-size: 16px;"
+                                + "-fx-text-fill: " + BLACK_COLOR + ";"));
+
+                comboBox.setOnMouseExited(e -> comboStyle(comboBox));
         }
 }

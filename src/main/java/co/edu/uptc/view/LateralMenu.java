@@ -92,12 +92,19 @@ public class LateralMenu {
     private TitledPane createHuespedesPane() {
         Button registrarHuesped = new Button("Registrar Huésped");
         ViewStyles.buttonStyle(registrarHuesped);
-        registrarHuesped.setOnAction(e -> notifyChange(
-                mainView.getCustomerPane()));
+        registrarHuesped.setOnAction(e -> {
+            notifyChange(
+                    mainView.getCustomerPane());
+            mainView.getCustomerPane().clearForm();
+        });
 
         Button gestionarHuesped = new Button("Gestionar Huésped");
         ViewStyles.buttonStyle(gestionarHuesped);
-        gestionarHuesped.setOnAction(e -> notifyChange(mainView.getCustomerSuggestPane()));
+        gestionarHuesped.setOnAction(e -> {
+            notifyChange(mainView.getCustomerSuggestPane());
+            mainView.getCustomerSuggestPane().clearForm();
+            toggleVisibility();
+        });
 
         VBox huespedesBox = new VBox(5, registrarHuesped, gestionarHuesped);
         TitledPane pane = new TitledPane("Huéspedes", huespedesBox);
@@ -108,7 +115,7 @@ public class LateralMenu {
     private TitledPane createHabitacionesPane() {
         Button verHabitaciones = new Button("Panel de Habitaciones");
         ViewStyles.buttonStyle(verHabitaciones);
-        verHabitaciones.setOnAction(e -> notifyChange(new RoomPane()));
+        verHabitaciones.setOnAction(e -> notifyChange(mainView.getRoomPane()));
 
         VBox habitacionesBox = new VBox(verHabitaciones);
         TitledPane pane = new TitledPane("Habitaciones", habitacionesBox);
@@ -144,8 +151,7 @@ public class LateralMenu {
     }
 
     public void toggleVisibility() {
-        isVisible = !isVisible;
-        mainView.getRoot().setLeft(isVisible ? menuBox : null);
+        mainView.toggleMenu();
     }
 
     private void notifyChange(Region panel) {

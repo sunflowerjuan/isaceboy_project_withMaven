@@ -68,6 +68,8 @@ public class CustomDialog {
         // Etiqueta
         Label messageLabel = new Label(message);
         messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(360); // <- evita desbordes horizontales
+        messageLabel.setMinHeight(100);
         ViewStyles.subtitleStyle(messageLabel);
         messageLabel.setStyle(messageLabel.getStyle() + "-fx-text-fill: white; -fx-font-size: 18px;");
 
@@ -105,7 +107,7 @@ public class CustomDialog {
             contentBox.getChildren().add(iconBox);
         contentBox.getChildren().addAll(messageLabel, buttonBox);
 
-        Scene scene = new Scene(contentBox, 420, 240);
+        Scene scene = new Scene(contentBox, 500, 300);
         scene.setFill(Color.TRANSPARENT);
         dialogStage.setScene(scene);
     }

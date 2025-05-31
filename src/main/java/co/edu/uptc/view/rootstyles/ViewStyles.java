@@ -2,6 +2,7 @@ package co.edu.uptc.view.rootstyles;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
@@ -13,8 +14,10 @@ public class ViewStyles {
         public static final String HOVER_COLOR = "#ECEFCA";
         public static final String LIGTH_TEXT = "white";
         public static final String WITHE_COLOR = "#ebebeb";
+        public static final String BLACK_COLOR = "rgb(0, 0, 0)";
         public static final String ALERT_COLOR = "rgb(139, 70, 62)";
         public static final String ALERT_COLOR_HOVER = "rgb(61, 27, 23)";
+        public static final String ERROR_COLOR = "#d9534f";
 
         // Títulos
         public static void titleStyle(Label label) {
@@ -24,11 +27,49 @@ public class ViewStyles {
                                 + " -fx-font-family: 'Segoe UI';");
         }
 
+        public static void titleStyle(Label label, int mode) {
+                if (mode == 0) {
+                        label.setStyle("-fx-text-fill: " + LIGTH_TEXT + ";"
+                                        + " -fx-font-size: 38px;"
+                                        + " -fx-font-weight: bold;"
+                                        + " -fx-font-family: 'Segoe UI';");
+                } else {
+                        label.setStyle("-fx-text-fill: " + PRIMARY_COLOR + ";"
+                                        + " -fx-font-size: 38px;"
+                                        + " -fx-font-weight: bold;"
+                                        + " -fx-font-family: 'Segoe UI';");
+                }
+        }
+
         // Subtítulos
         public static void subtitleStyle(Label label) {
                 label.setStyle("-fx-text-fill: " + LIGTH_TEXT + ";"
                                 + " -fx-font-size: 14px;"
                                 + " -fx-font-weight: bold;");
+        }
+
+        // Labels generales (formularios)
+        public static void formLabelStyle(Label label) {
+                label.setStyle("-fx-text-fill: " + PRIMARY_COLOR + ";"
+                                + " -fx-font-size: 20px;"
+                                + " -fx-font-weight: bold;");
+        }
+
+        // Estilo para campos de texto
+        public static void textFieldStyle(TextField field) {
+                field.setStyle("-fx-background-color: c2c2c2;"
+                                + " -fx-border-color: " + PRIMARY_COLOR + ";"
+                                + " -fx-border-radius: 6;"
+                                + " -fx-background-radius: 5;"
+                                + " -fx-padding: 5;"
+                                + " -fx-font-size: 18px;");
+        }
+
+        // Estilo para mensajes de error debajo del campo
+        public static void errorLabelStyle(Label label) {
+                label.setStyle("-fx-text-fill: " + ERROR_COLOR + ";"
+                                + " -fx-font-size: 12px;"
+                                + " -fx-font-style: italic;");
         }
 
         // Botones generales
@@ -41,13 +82,48 @@ public class ViewStyles {
                 button.setPrefHeight(40);
                 button.setMaxWidth(Double.MAX_VALUE);
 
-                // Hover
                 button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + THIRD_COLOR + ";"
                                 + " -fx-text-fill: " + PRIMARY_COLOR + ";"
                                 + " -fx-font-size: 15px;"
                                 + " -fx-font-weight: bold;"
                                 + " -fx-background-radius: 10;"));
                 button.setOnMouseExited(e -> buttonStyle(button));
+                button.setCursor(javafx.scene.Cursor.HAND);
+        }
+
+        public static void buttonStyle(Button button, int widthValue, int heightValue) {
+                button.setStyle("-fx-background-color: " + SECONDARY_COLOR + ";"
+                                + " -fx-text-fill: " + LIGTH_TEXT + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;");
+                button.setPrefHeight(heightValue);
+                button.setMaxWidth(widthValue);
+
+                button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + THIRD_COLOR + ";"
+                                + " -fx-text-fill: " + PRIMARY_COLOR + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;"));
+                button.setOnMouseExited(e -> buttonStyle(button, widthValue, heightValue));
+                button.setCursor(javafx.scene.Cursor.HAND);
+        }
+
+        public static void buttonStyle(Button button, int height) {
+                button.setStyle("-fx-background-color: " + SECONDARY_COLOR + ";"
+                                + " -fx-text-fill: " + LIGTH_TEXT + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;");
+                button.setPrefHeight(height);
+                button.setMaxWidth(Double.MAX_VALUE);
+
+                button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + THIRD_COLOR + ";"
+                                + " -fx-text-fill: " + PRIMARY_COLOR + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;"));
+                button.setOnMouseExited(e -> buttonStyle(button, height));
                 button.setCursor(javafx.scene.Cursor.HAND);
         }
 
@@ -75,27 +151,24 @@ public class ViewStyles {
 
                 if (pane.getContent() instanceof VBox vbox) {
                         vbox.setStyle(
-                                        "-fx-background-color: " + WITHE_COLOR + ";" +
-                                                        "-fx-padding: 10 20 10 30;" + // top right bottom left: deja
-                                                                                      // espacio a la izquierda
-                                                        "-fx-spacing: 10;" +
-                                                        "-fx-alignment: CENTER_LEFT;"); // Alinea a la izquierda para
-                                                                                        // que no se amontonen a la
-                                                                                        // derecha
+                                        "-fx-background-color: " + WITHE_COLOR + ";"
+                                                        + "-fx-padding: 10 20 10 30;"
+                                                        + "-fx-spacing: 10;"
+                                                        + "-fx-alignment: CENTER_LEFT;");
                 }
                 pane.setExpanded(false);
         }
 
         public static Button windowsButton(String text, boolean isCloseButton) {
                 Button button = new Button(text);
-                String baseStyle = "-fx-background-color: transparent; -fx-text-fill: " +
-                                (isCloseButton ? "red" : "white") + "; -fx-font-size: 14px; -fx-cursor: hand;";
+                String baseStyle = "-fx-background-color: transparent; -fx-text-fill: "
+                                + (isCloseButton ? "red" : "white")
+                                + "; -fx-font-size: 14px; -fx-cursor: hand;";
                 button.setStyle(baseStyle);
 
-                // Efecto hover
                 button.setOnMouseEntered(e -> button.setStyle(
-                                "-fx-background-color: " + PRIMARY_COLOR + "; -fx-text-fill: " +
-                                                (isCloseButton ? "white" : "white")
+                                "-fx-background-color: " + PRIMARY_COLOR + "; -fx-text-fill: "
+                                                + (isCloseButton ? "white" : "white")
                                                 + "; -fx-font-size: 14px; -fx-cursor: hand;"));
 
                 button.setOnMouseExited(e -> button.setStyle(baseStyle));

@@ -1,26 +1,23 @@
 package co.edu.uptc.view;
 
+import co.edu.uptc.view.customer.CustomerPane;
+import co.edu.uptc.view.room.RoomPane;
+import co.edu.uptc.view.rootstyles.DialogMessage;
+import co.edu.uptc.view.rootstyles.ViewStyles;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-
 import java.util.function.Consumer;
-
-import co.edu.uptc.view.customer.CustomerSuggestPane;
-import co.edu.uptc.view.customer.CustomerPane;
-import co.edu.uptc.view.room.RoomPane;
-import co.edu.uptc.view.rootstyles.DialogMessage;
-import co.edu.uptc.view.rootstyles.ViewStyles;
 
 public class LateralMenu {
 
     private VBox menuBox;
     private Consumer<Region> onPanelSelected;
     private MainView mainView;
+    private boolean isVisible = true;
 
     public LateralMenu(MainView mainView) {
         this.mainView = mainView;
@@ -33,7 +30,6 @@ public class LateralMenu {
         VBox headerBox = createHeader();
         Accordion menu = createMenu();
 
-        // Botones inferiores centrados
         Button manualBtn = createManualButton();
         Button closeBtn = createCloseButton();
 
@@ -96,11 +92,12 @@ public class LateralMenu {
     private TitledPane createHuespedesPane() {
         Button registrarHuesped = new Button("Registrar Huésped");
         ViewStyles.buttonStyle(registrarHuesped);
-        registrarHuesped.setOnAction(e -> notifyChange(new CustomerPane()));
+        registrarHuesped.setOnAction(e -> notifyChange(
+                mainView.getCustomerPane()));
 
         Button gestionarHuesped = new Button("Gestionar Huésped");
         ViewStyles.buttonStyle(gestionarHuesped);
-        gestionarHuesped.setOnAction(e -> notifyChange(new CustomerSuggestPane()));
+        gestionarHuesped.setOnAction(e -> notifyChange(mainView.getCustomerSuggestPane()));
 
         VBox huespedesBox = new VBox(5, registrarHuesped, gestionarHuesped);
         TitledPane pane = new TitledPane("Huéspedes", huespedesBox);
@@ -121,10 +118,10 @@ public class LateralMenu {
 
     private Button createManualButton() {
         Button manualBtn = new Button("Manual de Usuario");
-        ViewStyles.buttonStyle(manualBtn);
+        ViewStyles.buttonStyle(manualBtn, 50);
         manualBtn.setOnAction(e -> {
-            DialogMessage.showConfirmDialog(mainView.getStage(), "esta seguro de que tiene fimosis",
-                    () -> System.out.println("Reserva eliminada."));
+            DialogMessage.showInfoDialog(mainView.getStage(), "Manual de Usuario\n" +
+                    "El manual de usuario está disponible en la carpeta del proyecto, en la ruta: src/main/resources/manual.pdf");
         });
         return manualBtn;
     }
@@ -132,7 +129,9 @@ public class LateralMenu {
     private Button createCloseButton() {
         Button cerrarBtn = new Button("Cerrar");
         ViewStyles.closeBtnStyle(cerrarBtn);
-        cerrarBtn.setOnAction(e -> System.exit(0));
+        cerrarBtn.setOnAction(
+                e -> DialogMessage.showConfirmDialog(mainView.getStage(), "DESEA CERRAR EL PROGRAMA?",
+                        () -> System.exit(0)));
         return cerrarBtn;
     }
 
@@ -142,6 +141,11 @@ public class LateralMenu {
 
     public void setOnPanelSelected(Consumer<Region> listener) {
         this.onPanelSelected = listener;
+    }
+
+    public void toggleVisibility() {
+        isVisible = !isVisible;
+        mainView.getRoot().setLeft(isVisible ? menuBox : null);
     }
 
     private void notifyChange(Region panel) {

@@ -1,5 +1,6 @@
 package co.edu.uptc;
 
+import co.edu.uptc.presenter.Presenter;
 import co.edu.uptc.view.MainView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -12,7 +13,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.getIcons().add(new Image("file:src/main/resources/images/IASCEBOY.jpg"));
+
         MainView mainView = new MainView(primaryStage);
+        Presenter controller = new Presenter(mainView);
+        mainView.setPresenter(controller);
+        mainView.setupView();
+
         Scene scene = new Scene(mainView.getRoot(), 1200, 800);
         scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
 
@@ -21,6 +27,7 @@ public class Main extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setTitle("IASCEBOY - Sistema Gestor de Reservas");
         primaryStage.show();
+        new Presenter(mainView);
     }
 
     public static void main(String[] args) {

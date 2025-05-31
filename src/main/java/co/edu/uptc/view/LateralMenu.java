@@ -6,14 +6,15 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 import java.util.function.Consumer;
 
-import co.edu.uptc.view.booking.BookingPane;
-import co.edu.uptc.view.booking.ShowBookingPane;
 import co.edu.uptc.view.customer.CustomerSuggestPane;
 import co.edu.uptc.view.customer.CustomerPane;
 import co.edu.uptc.view.room.RoomPane;
+import co.edu.uptc.view.rootstyles.DialogMessage;
+import co.edu.uptc.view.rootstyles.ViewStyles;
 
 public class LateralMenu {
 
@@ -31,23 +32,29 @@ public class LateralMenu {
 
         VBox headerBox = createHeader();
         Accordion menu = createMenu();
+
+        // Botones inferiores centrados
+        Button manualBtn = createManualButton();
         Button closeBtn = createCloseButton();
 
-        menuBox.getChildren().addAll(headerBox, menu, closeBtn);
+        VBox bottomButtons = new VBox(10, manualBtn, closeBtn);
+        bottomButtons.setAlignment(Pos.CENTER);
+        bottomButtons.setPadding(new Insets(20, 0, 0, 0));
+
+        VBox.setVgrow(menu, Priority.ALWAYS);
+
+        menuBox.getChildren().addAll(headerBox, menu, bottomButtons);
     }
 
     private VBox createHeader() {
         ImageView logoView = new ImageView(new Image("file:src/main/resources/images/logo.png"));
-        logoView.setFitHeight(200);
+        logoView.setFitHeight(150);
         logoView.setPreserveRatio(true);
 
-        Label title = new Label("IASCEBOY");
+        Label title = new Label("SISTEMA \nGESTOR DE \nRESERVAS");
         ViewStyles.titleStyle(title);
 
-        Label subtitle = new Label("SISTEMA GESTOR DE RESERVAS");
-        ViewStyles.subtitleStyle(subtitle);
-
-        VBox headerBox = new VBox(5, logoView, title, subtitle);
+        VBox headerBox = new VBox(5, logoView, title);
         headerBox.setAlignment(Pos.CENTER);
         return headerBox;
     }
@@ -110,6 +117,16 @@ public class LateralMenu {
         TitledPane pane = new TitledPane("Habitaciones", habitacionesBox);
         ViewStyles.titledPane(pane);
         return pane;
+    }
+
+    private Button createManualButton() {
+        Button manualBtn = new Button("Manual de Usuario");
+        ViewStyles.buttonStyle(manualBtn);
+        manualBtn.setOnAction(e -> {
+            DialogMessage.showConfirmDialog(mainView.getStage(), "esta seguro de que tiene fimosis",
+                    () -> System.out.println("Reserva eliminada."));
+        });
+        return manualBtn;
     }
 
     private Button createCloseButton() {

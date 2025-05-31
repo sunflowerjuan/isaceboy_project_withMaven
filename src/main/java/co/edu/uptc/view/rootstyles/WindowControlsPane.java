@@ -1,4 +1,4 @@
-package co.edu.uptc.view;
+package co.edu.uptc.view.rootstyles;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

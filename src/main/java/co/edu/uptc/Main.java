@@ -17,8 +17,8 @@ public class Main extends Application {
         scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
 
         primaryStage.setScene(scene);
-        primaryStage.initStyle(StageStyle.UNDECORATED); // Sin bordes
-        primaryStage.setMaximized(true); // Pantalla completa
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.setMaximized(true);
         primaryStage.setTitle("IASCEBOY - Sistema Gestor de Reservas");
         primaryStage.show();
     }

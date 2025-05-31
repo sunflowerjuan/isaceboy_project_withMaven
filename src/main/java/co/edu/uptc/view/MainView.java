@@ -2,6 +2,7 @@ package co.edu.uptc.view;
 
 import co.edu.uptc.view.booking.BookingPane;
 import co.edu.uptc.view.booking.ShowBookingPane;
+import co.edu.uptc.view.rootstyles.WindowControlsPane;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -12,11 +13,13 @@ public class MainView {
     private LateralMenu menu;
     private BookingPane bookingPane;
     private ShowBookingPane showBookingPane;
+    private Stage stage;
 
     public MainView(Stage stage) {
         root = new BorderPane();
         menu = new LateralMenu(this);
         root.setLeft(menu.getMenu());
+        this.stage = stage;
 
         // Añadir barra de control ventana arriba
         WindowControlsPane windowControlsPane = new WindowControlsPane(stage);
@@ -52,5 +55,13 @@ public class MainView {
 
     public void setShowBookingPane(ShowBookingPane showBookingPane) {
         this.showBookingPane = showBookingPane;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 }

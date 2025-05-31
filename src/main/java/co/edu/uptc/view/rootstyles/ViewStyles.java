@@ -1,4 +1,4 @@
-package co.edu.uptc.view;
+package co.edu.uptc.view.rootstyles;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

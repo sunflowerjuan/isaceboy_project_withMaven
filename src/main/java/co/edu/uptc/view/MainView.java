@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -46,7 +47,7 @@ public class MainView {
     }
 
     public void initComponets() {
-        bookingPane = new BookingPane();
+        bookingPane = new BookingPane(presenter, stage);
         showBookingPane = new ShowBookingPane();
         customerPane = new CustomerPane(presenter, stage);
         customerSuggestPane = new CustomerSuggest(presenter, stage);
@@ -154,6 +155,10 @@ public class MainView {
 
     public void setPresenter(Presenter controller) {
         this.presenter = controller;
+    }
+
+    public void notifyChange(Region pane) {
+        menu.notifyChange(pane);
     }
 
 }

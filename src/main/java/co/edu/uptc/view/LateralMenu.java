@@ -77,7 +77,10 @@ public class LateralMenu {
     private TitledPane createBookingPane() {
         Button createBooking = new Button("Crear Reserva");
         ViewStyles.buttonStyle(createBooking);
-        createBooking.setOnAction(e -> notifyChange(mainView.getBookingPane()));
+        createBooking.setOnAction(e -> {
+            notifyChange(mainView.getBookingPane());
+            mainView.getCustomerPane().setFromReservation(false);
+        });
 
         Button showBooking = new Button("Ver Reservas");
         ViewStyles.buttonStyle(showBooking);
@@ -154,7 +157,7 @@ public class LateralMenu {
         mainView.toggleMenu();
     }
 
-    private void notifyChange(Region panel) {
+    public void notifyChange(Region panel) {
         if (onPanelSelected != null) {
             onPanelSelected.accept(panel);
         }

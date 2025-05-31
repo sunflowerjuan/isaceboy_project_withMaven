@@ -89,7 +89,7 @@ public class RoomPane extends VBox {
         roomCountField.setEditable(false);
         roomCountField.setPrefWidth(350);
         roomCountField.setPrefHeight(40);
-        ViewStyles.textFieldStyle(roomCountField);
+        ViewStyles.textFieldNoEdStyle(roomCountField);
     }
 
     private void createPriceField() {

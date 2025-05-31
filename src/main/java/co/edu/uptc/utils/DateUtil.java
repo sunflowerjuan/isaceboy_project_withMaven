@@ -19,4 +19,18 @@ public class DateUtil {
         LocalDate localDate = LocalDate.parse(dateString, formatter);
         return toDate(localDate);
     }
+
+    public static LocalDate toLocalDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        if (date instanceof java.sql.Date) {
+            return ((java.sql.Date) date).toLocalDate();
+        } else {
+            return date.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+        }
+    }
+
 }

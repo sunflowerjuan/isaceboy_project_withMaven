@@ -65,6 +65,8 @@ public class BookingSystem {
 
     // Crud operations for Rooms
     public boolean createRoom(Room room) {
+        int nextId = persistence.countRooms();
+        room.setId(nextId);
         return persistence.createRoom(room);
     }
 
@@ -140,16 +142,14 @@ public class BookingSystem {
     }
 
     public List<Booking> getBookingsByRoomType(RoomType roomType) {
-        List<Booking> bookingsByRoomType = new ArrayList<>();
-        for (Booking booking : bookings) {
-            if (booking.getRoom().getRoomType() == roomType) {
-                bookingsByRoomType.add(booking);
-            }
-        }
-        return bookingsByRoomType;
+        return persistence.findBookingsByRoomType(roomType);
     }
 
     public int countBookings() {
+        return persistence.countBookings();
+    }
+
+    public int getNextBookingId() {
         return persistence.countBookings();
     }
 

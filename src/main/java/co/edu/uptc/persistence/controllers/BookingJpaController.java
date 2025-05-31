@@ -121,7 +121,7 @@ public class BookingJpaController implements Serializable {
     public List<Booking> findBookingsByRoomType(RoomType roomType) {
         EntityManager em = getEntityManager();
         try {
-            String jpql = "SELECT b FROM Booking b WHERE b.room.roomType = :roomType AND b.startDate >= :today";
+            String jpql = "SELECT b FROM Booking b WHERE b.room.roomType = :roomType AND b.endDate >= :today";
             return em.createQuery(jpql, Booking.class)
                     .setParameter("roomType", roomType)
                     .setParameter("today", new Date(), TemporalType.DATE)

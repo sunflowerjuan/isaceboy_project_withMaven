@@ -12,13 +12,17 @@ import javafx.stage.Stage;
 
 public class CustomerPane extends VBox {
     private TextField idField, nameField, lastNameField, addressField, emailField, phoneField;
+
     private Label idError, nameError, lastNameError, addressError, emailError, phoneError;
     private Button saveButton;
 
     private Stage stage;
     private Presenter presenter;
 
+    private boolean fromReservation;
+
     public CustomerPane(Presenter presenter, Stage stage) {
+        fromReservation = false;
         this.presenter = presenter;
         this.stage = stage;
         initComponets();
@@ -277,18 +281,40 @@ public class CustomerPane extends VBox {
     }
 
     public void clearForm() {
-        idField.clear();
-        nameField.clear();
-        lastNameField.clear();
-        addressField.clear();
-        emailField.clear();
-        phoneField.clear();
+        if (fromReservation) {
+            fromReservation = false;
+            presenter.goToBookingPane(idField.getText().replaceAll("\\.", ""));
 
-        idError.setVisible(false);
-        nameError.setVisible(false);
-        lastNameError.setVisible(false);
-        addressError.setVisible(false);
-        emailError.setVisible(false);
-        phoneError.setVisible(false);
+        } else {
+            idField.clear();
+            nameField.clear();
+            lastNameField.clear();
+            addressField.clear();
+            emailField.clear();
+            phoneField.clear();
+
+            idError.setVisible(false);
+            nameError.setVisible(false);
+            lastNameError.setVisible(false);
+            addressError.setVisible(false);
+            emailError.setVisible(false);
+            phoneError.setVisible(false);
+        }
+    }
+
+    public boolean isFromReservation() {
+        return fromReservation;
+    }
+
+    public void setFromReservation(boolean fromReservation) {
+        this.fromReservation = fromReservation;
+    }
+
+    public TextField getIdField() {
+        return idField;
+    }
+
+    public void setIdField(TextField idField) {
+        this.idField = idField;
     }
 }

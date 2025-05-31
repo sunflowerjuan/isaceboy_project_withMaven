@@ -1,15 +1,25 @@
 package co.edu.uptc.presenter;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import co.edu.uptc.model.Booking;
 import co.edu.uptc.model.BookingSystem;
 import co.edu.uptc.model.Customer;
 import co.edu.uptc.model.Room;
 import co.edu.uptc.model.RoomType;
+import co.edu.uptc.utils.DateUtil;
 import co.edu.uptc.view.MainView;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.util.Callback;
 
 public class Presenter {
 
@@ -107,6 +117,133 @@ public class Presenter {
         Room room = bookingSystem.findRoom(roomType);
         room.setPricePerNight(price);
         bookingSystem.updateRoom(room);
+    }
+
+    public List<LocalDate> getUnavailableDates(RoomType roomType) {
+        List<Booking> bookings = bookingSystem.getBookingsByRoomType(roomType);
+        System.out.println(bookings.size());
+        Map<LocalDate, Integer> dateCountMap = new HashMap<>();
+
+        Room room = bookingSystem.findRoom(roomType);
+        int totalRooms = 0;
+        if (room != null) {
+            totalRooms = room.getNumberOfRooms();
+        }
+
+        for (Booking booking : bookings) {
+            if (!booking.isActive())
+                continue;
+
+            LocalDate start = DateUtil.toLocalDate(booking.getStartDate());
+            LocalDate end = DateUtil.toLocalDate(booking.getEndDate());
+
+            for (LocalDate date = start; !date.isAfter(end.minusDays(1)); date = date.plusDays(1)) {
+                dateCountMap.put(date, dateCountMap.getOrDefault(date, 0) + 1);
+            }
+        }
+
+        List<LocalDate> unavailableDates = new ArrayList<>();
+        for (Map.Entry<LocalDate, Integer> entry : dateCountMap.entrySet()) {
+            if (entry.getValue() >= totalRooms) {
+                unavailableDates.add(entry.getKey());
+            }
+        }
+
+        return unavailableDates;
+    }
+
+    public Callback<DatePicker, DateCell> getAvailableCheckInDates(RoomType roomType) {
+        List<LocalDate> unavailableDates = getUnavailableDates(roomType);
+        LocalDate today = LocalDate.now();
+        return datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || unavailableDates.contains(date) || date.isBefore(today)) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;"); // rojo claro
+                }
+            }
+        };
+    }
+
+    public Callback<DatePicker, DateCell> getAvailableCheckOutDates(RoomType roomType, LocalDate checkInDate) {
+        List<LocalDate> unavailableDates = getUnavailableDates(roomType);
+        return datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date.isBefore(checkInDate.plusDays(1))) {
+                    setDisable(true);
+                } else {
+                    LocalDate cursor = checkInDate;
+                    boolean available = true;
+                    while (!cursor.isEqual(date)) {
+                        if (unavailableDates.contains(cursor)) {
+                            available = false;
+                            break;
+                        }
+                        cursor = cursor.plusDays(1);
+                    }
+                    if (!available || unavailableDates.contains(date)) {
+                        setDisable(true);
+                        setStyle("-fx-background-color: #ffc0cb;");
+                    } else {
+                        setStyle("-fx-background-color: #c8e6c9;"); // verde claro
+                    }
+                }
+            }
+        };
+    }
+
+    public String[] getCustomerDataById(String selected) {
+        Customer customer = bookingSystem.findCustomer(selected);
+        if (customer != null) {
+            return new String[] {
+                    customer.getIdentification(),
+                    customer.getName(),
+                    customer.getLastName(),
+                    customer.getAddress(),
+                    customer.getEmail(),
+                    customer.getPhoneNumber()
+            };
+        }
+        return null;
+    }
+
+    public double calculateBookingPrice(RoomType value, long nights) {
+        Room room = bookingSystem.findRoom(value);
+        if (room != null) {
+            return room.getPricePerNight() * nights;
+        }
+        return 0.0;
+    }
+
+    public boolean createBooking(String customerId, RoomType roomType, LocalDate checkIn, LocalDate checkOut,
+            String value) {
+        Customer customer = bookingSystem.findCustomer(customerId);
+        Room room = bookingSystem.findRoom(roomType);
+        Double price = Double.parseDouble(value);
+        int id = bookingSystem.getNextBookingId();
+        if (customer == null || room == null) {
+            return false;
+        }
+        Booking booking = new Booking(id, customer, room,
+                Date.from(checkIn.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(checkOut.atStartOfDay(ZoneId.systemDefault()).toInstant()), price, true);
+        return bookingSystem.createBooking(booking);
+    }
+
+    public void showCustomerForm(String identification) {
+        mainView.getCustomerPane().setFromReservation(true);
+        mainView.getCustomerPane().getIdField().setText(identification);
+        mainView.notifyChange(mainView.getCustomerPane());
+    }
+
+    public void goToBookingPane(String customerId) {
+        mainView.notifyChange(mainView.getBookingPane());
+        mainView.getBookingPane().loadCustomerData();
+        mainView.getBookingPane().updateSuggestions(customerId);
     }
 
 }

@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -59,7 +60,7 @@ public class BookingPane extends VBox {
                             "No hay información disponible para el tipo de habitación seleccionado.");
                     registerCustomerBtn.setDisable(true);
                 } else {
-                    checkInDate.setDayCellFactory(presenter.getAvailableCheckInDates(selected));
+                    checkInDate.setDayCellFactory(getAvailableCheckInDates(selected));
                     checkInDate.setDisable(false);
                     checkInDate.setValue(null);
                     checkOutDate.setValue(null);
@@ -74,7 +75,7 @@ public class BookingPane extends VBox {
         checkInDate.getEditor().setDisable(true); // No edición manual
         checkInDate.setPrefHeight(40);
         checkInDate.getEditor().setStyle("-fx-font-size: 16px;");
-        checkInDate.setDayCellFactory(presenter.getAvailableCheckOutDates(roomTypeBox.getValue(), LocalDate.now()));
+        checkInDate.setDayCellFactory(getAvailableCheckOutDates(roomTypeBox.getValue(), LocalDate.now()));
         checkInDate.setOnAction(e -> updateCheckOutAvailability());
 
         checkOutDate = new DatePicker();
@@ -225,7 +226,7 @@ public class BookingPane extends VBox {
             LocalDate checkIn = checkInDate.getValue();
             checkOutDate.setDisable(false);
             checkOutDate.setValue(null);
-            checkOutDate.setDayCellFactory(presenter.getAvailableCheckOutDates(roomType, checkIn));
+            checkOutDate.setDayCellFactory(getAvailableCheckOutDates(roomType, checkIn));
 
         }
     }
@@ -275,4 +276,66 @@ public class BookingPane extends VBox {
         registerCustomerBtn.setDisable(true);
     }
 
+    public Callback<DatePicker, DateCell> getAvailableCheckInDates(RoomType roomType) {
+        List<LocalDate> unavailableDates = presenter.getUnavailableDates(roomType);
+        LocalDate today = LocalDate.now();
+
+        return datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+
+                if (empty || date.isBefore(today) || unavailableDates.contains(date)) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;");
+                    return;
+                }
+
+                // Verificar si hay al menos una fecha continua posterior disponible para salir
+                boolean hasAvailableRange = false;
+                LocalDate nextDate = date.plusDays(1);
+                for (int i = 0; i < 30; i++) { // Máximo 30 días de búsqueda
+                    if (!unavailableDates.contains(nextDate)) {
+                        hasAvailableRange = true;
+                        break;
+                    }
+                    nextDate = nextDate.plusDays(1);
+                }
+
+                if (!hasAvailableRange) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;");
+                }
+            }
+        };
+    }
+
+    public Callback<DatePicker, DateCell> getAvailableCheckOutDates(RoomType roomType, LocalDate checkInDate) {
+        List<LocalDate> unavailableDates = presenter.getUnavailableDates(roomType);
+        return datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date.isBefore(checkInDate.plusDays(1))) {
+                    setDisable(true);
+                } else {
+                    LocalDate cursor = checkInDate;
+                    boolean available = true;
+                    while (!cursor.isEqual(date)) {
+                        if (unavailableDates.contains(cursor)) {
+                            available = false;
+                            break;
+                        }
+                        cursor = cursor.plusDays(1);
+                    }
+                    if (!available || unavailableDates.contains(date)) {
+                        setDisable(true);
+                        setStyle("-fx-background-color: #ffc0cb;");
+                    } else {
+                        setStyle("-fx-background-color: #c8e6c9;"); // verde claro
+                    }
+                }
+            }
+        };
+    }
 }

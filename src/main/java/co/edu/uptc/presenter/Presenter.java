@@ -31,9 +31,9 @@ public class Presenter {
         this.bookingSystem = new BookingSystem();
     }
 
-    public boolean createCustomer(String[] data) {
+    public String createCustomer(String[] data) {
         if (data.length < 6) {
-            return false;
+            return "Informacion Incompleta";
         }
         String id = data[0];
         String name = data[1];
@@ -155,13 +155,32 @@ public class Presenter {
     public Callback<DatePicker, DateCell> getAvailableCheckInDates(RoomType roomType) {
         List<LocalDate> unavailableDates = getUnavailableDates(roomType);
         LocalDate today = LocalDate.now();
+
         return datePicker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                if (empty || unavailableDates.contains(date) || date.isBefore(today)) {
+
+                if (empty || date.isBefore(today) || unavailableDates.contains(date)) {
                     setDisable(true);
-                    setStyle("-fx-background-color: #ffc0cb;"); // rojo claro
+                    setStyle("-fx-background-color: #ffc0cb;");
+                    return;
+                }
+
+                // Verificar si hay al menos una fecha continua posterior disponible para salir
+                boolean hasAvailableRange = false;
+                LocalDate nextDate = date.plusDays(1);
+                for (int i = 0; i < 30; i++) { // Máximo 30 días de búsqueda
+                    if (!unavailableDates.contains(nextDate)) {
+                        hasAvailableRange = true;
+                        break;
+                    }
+                    nextDate = nextDate.plusDays(1);
+                }
+
+                if (!hasAvailableRange) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;");
                 }
             }
         };

@@ -91,10 +91,11 @@ public class CustomerPane extends VBox {
         ViewStyles.buttonStyle(saveButton, 650, 60);
         saveButton.setOnAction(e -> {
             if (validateFields()) {
-                if (presenter.createCustomer(getCustomerFromForm())) {
+                String confirmMsg = presenter.createCustomer(getCustomerFromForm());
+                if (confirmMsg.contains("valido")) {
                     DialogMessage.showSuccessDialog(stage, "Huesped Agregado correctamente");
                 } else {
-                    DialogMessage.showErrorDialog(stage, "Operación no completada. \nVerifique los datos.");
+                    DialogMessage.showErrorDialog(stage, "Operación no completada. \n" + confirmMsg);
                 }
                 clearForm();
             } else {

@@ -65,8 +65,12 @@ public class BookingSystem {
 
     public boolean deleteCustomer(String id) {
         try {
-            persistence.deleteCustomer(id);
-            return true;
+            if (!persistence.hasActiveBookingForCustomer(id)) {
+                persistence.deleteCustomer(id);
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             return false;
         }

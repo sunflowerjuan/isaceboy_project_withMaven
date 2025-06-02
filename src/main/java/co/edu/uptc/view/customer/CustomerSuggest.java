@@ -6,20 +6,24 @@ import co.edu.uptc.view.rootstyles.ViewStyles;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomerSuggest extends HBox {
     private TextField searchField;
     private VBox listBox;
     private TextField idField, nameField, lastNameField, addressField, emailField, phoneField;
+    private Label nameError, lastNameError, emailError, phoneError;
     private Button editButton, deleteButton, updateButton;
-
     private Presenter presenter;
     private Stage stage;
+    private final Map<TextField, Label> validationMap = new HashMap<>();
 
     public CustomerSuggest(Presenter presenter, Stage stage) {
         this.presenter = presenter;
@@ -38,16 +42,22 @@ public class CustomerSuggest extends HBox {
 
         idField = createTextField();
         idField.setEditable(false);
+
         nameField = createTextField();
-        nameField.setEditable(false);
         lastNameField = createTextField();
-        lastNameField.setEditable(false);
         addressField = createTextField();
-        addressField.setEditable(false);
         emailField = createTextField();
-        emailField.setEditable(false);
         phoneField = createTextField();
-        phoneField.setEditable(false);
+
+        nameError = createErrorLabel();
+        lastNameError = createErrorLabel();
+        emailError = createErrorLabel();
+        phoneError = createErrorLabel();
+
+        validationMap.put(nameField, nameError);
+        validationMap.put(lastNameField, lastNameError);
+        validationMap.put(emailField, emailError);
+        validationMap.put(phoneField, phoneError);
 
         editButton = new Button("Editar");
         deleteButton = new Button("Eliminar");
@@ -57,6 +67,13 @@ public class CustomerSuggest extends HBox {
         ViewStyles.buttonStyle(editButton, 200, 50);
         ViewStyles.closeBtnStyle(deleteButton);
         ViewStyles.buttonStyle(updateButton, 200, 50);
+    }
+
+    private Label createErrorLabel() {
+        Label label = new Label();
+        ViewStyles.errorLabelStyle(label);
+        label.setVisible(false);
+        return label;
     }
 
     private void setupLayout() {
@@ -89,37 +106,42 @@ public class CustomerSuggest extends HBox {
 
         GridPane formGrid = new GridPane();
         formGrid.setHgap(100);
-        formGrid.setVgap(20);
+        formGrid.setVgap(10);
         formGrid.setAlignment(Pos.TOP_CENTER);
 
         int row = 0;
-        formGrid.add(fieldBox("Cédula:", idField), 0, row);
-        formGrid.add(fieldBox("Nombre:", nameField), 1, row++);
+        formGrid.add(fieldBox("Cédula:", idField, null), 0, row);
+        formGrid.add(fieldBox("Nombre:", nameField, nameError), 1, row++);
 
-        formGrid.add(fieldBox("Apellido:", lastNameField), 0, row);
-        formGrid.add(fieldBox("Dirección:", addressField), 1, row++);
+        formGrid.add(fieldBox("Apellido:", lastNameField, lastNameError), 0, row);
+        formGrid.add(fieldBox("Dirección:", addressField, null), 1, row++);
 
-        formGrid.add(fieldBox("Email:", emailField), 0, row);
-        formGrid.add(fieldBox("Teléfono:", phoneField), 1, row++);
+        formGrid.add(fieldBox("Email:", emailField, emailError), 0, row);
+        formGrid.add(fieldBox("Teléfono:", phoneField, phoneError), 1, row++);
 
         HBox buttonBox = new HBox(50, editButton, deleteButton, updateButton);
-        buttonBox.setPadding(new Insets(100, 0, 0, 0));
+        buttonBox.setPadding(new Insets(30, 0, 0, 0));
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox leftPane = new VBox(15, title, formGrid, buttonBox);
+        Label shortcuts = new Label("Atajos: E = Editar | D = Eliminar | Enter = Actualizar");
+        ViewStyles.formLabelStyle(shortcuts);
+        VBox leftPane = new VBox(15, title, formGrid, buttonBox, shortcuts);
         leftPane.setAlignment(Pos.TOP_CENTER);
         leftPane.setPrefWidth(750);
 
         HBox.setHgrow(leftPane, Priority.ALWAYS);
-
         this.getChildren().addAll(leftPane, searchPane);
         this.setSpacing(10);
     }
 
-    private VBox fieldBox(String labelText, TextField field) {
+    private VBox fieldBox(String labelText, TextField field, Label errorLabel) {
         Label label = new Label(labelText);
         ViewStyles.formLabelStyle(label);
-        return new VBox(5, label, field);
+        VBox box = new VBox(2, label, field);
+        if (errorLabel != null) {
+            box.getChildren().add(errorLabel);
+        }
+        return box;
     }
 
     private TextField createTextField() {
@@ -142,6 +164,26 @@ public class CustomerSuggest extends HBox {
             updateSuggestions(input);
         });
 
+        nameField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+            if (!e.getCharacter().matches("[a-zA-ZáéíóúÁÉÍÓÚ\\s]"))
+                e.consume();
+        });
+        lastNameField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+            if (!e.getCharacter().matches("[a-zA-ZáéíóúÁÉÍÓÚ\\s]"))
+                e.consume();
+        });
+        phoneField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
+            if (!e.getCharacter().matches("[0-9\\s]"))
+                e.consume();
+        });
+
+        for (TextField field : validationMap.keySet()) {
+            field.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal)
+                    validateField(field);
+            });
+        }
+
         editButton.setOnAction(e -> {
             if (areFieldsFilled()) {
                 setEditableFields(true);
@@ -152,10 +194,14 @@ public class CustomerSuggest extends HBox {
         });
 
         updateButton.setOnAction(e -> {
-            String msg = presenter.updateCustomer(getCustomerFromForm());
-            DialogMessage.showInfoDialog(stage, msg);
-            setEditableFields(false);
-            clearForm();
+            if (validateAll()) {
+                String msg = presenter.updateCustomer(getCustomerFromForm());
+                DialogMessage.showInfoDialog(stage, msg);
+                setEditableFields(false);
+                clearForm();
+            } else {
+                DialogMessage.showErrorDialog(stage, "Error de validación\nVerifique los campos marcados en rojo.");
+            }
         });
 
         deleteButton.setOnAction(e -> {
@@ -172,6 +218,38 @@ public class CustomerSuggest extends HBox {
                 DialogMessage.showErrorDialog(stage, "CAMPOS VACIOS\nDebe seleccionar un usuario antes de eliminarlo.");
             }
         });
+
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.E)
+                editButton.fire();
+            if (e.getCode() == KeyCode.D)
+                deleteButton.fire();
+            if (e.getCode() == KeyCode.ENTER)
+                updateButton.fire();
+        });
+    }
+
+    private boolean validateAll() {
+        boolean valid = true;
+        for (TextField field : validationMap.keySet()) {
+            if (!validateField(field))
+                valid = false;
+        }
+        return valid;
+    }
+
+    private boolean validateField(TextField field) {
+        Label errorLabel = validationMap.get(field);
+        boolean isValid = !field.getText().trim().isEmpty();
+        if (field == emailField)
+            isValid = field.getText().matches("^.+@.+\\..+$");
+        if (!isValid) {
+            errorLabel.setText("Campo inválido o vacío");
+            errorLabel.setVisible(true);
+        } else {
+            errorLabel.setVisible(false);
+        }
+        return isValid;
     }
 
     private boolean areFieldsFilled() {
@@ -223,12 +301,10 @@ public class CustomerSuggest extends HBox {
             customerCard.setPadding(new Insets(10));
             customerCard.setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5px;");
 
-            customerCard.setOnMouseEntered(e -> customerCard.setStyle(
-                    "-fx-background-color:" + ViewStyles.THIRD_COLOR
-                            + "; -fx-border-color: #999999; -fx-border-radius: 5px; -fx-cursor: hand;"));
-            customerCard.setOnMouseExited(e -> customerCard.setStyle(
-                    "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5px;"));
-
+            customerCard.setOnMouseEntered(e -> customerCard.setStyle("-fx-background-color:" + ViewStyles.THIRD_COLOR
+                    + "; -fx-border-color: #999999; -fx-border-radius: 5px; -fx-cursor: hand;"));
+            customerCard.setOnMouseExited(e -> customerCard
+                    .setStyle("-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5px;"));
             customerCard.setOnMouseClicked(e -> fillForm(customer));
 
             listBox.getChildren().add(customerCard);
@@ -260,13 +336,13 @@ public class CustomerSuggest extends HBox {
     }
 
     public String[] getCustomerFromForm() {
-        String[] customerData = new String[6];
-        customerData[0] = idField.getText();
-        customerData[1] = nameField.getText().trim();
-        customerData[2] = lastNameField.getText().trim();
-        customerData[3] = addressField.getText().trim();
-        customerData[4] = emailField.getText().trim();
-        customerData[5] = phoneField.getText().trim();
-        return customerData;
+        return new String[] {
+                idField.getText(),
+                nameField.getText().trim(),
+                lastNameField.getText().trim(),
+                addressField.getText().trim(),
+                emailField.getText().trim(),
+                phoneField.getText().trim()
+        };
     }
 }

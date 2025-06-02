@@ -18,8 +18,21 @@ public class BookingSystem {
 
     // Crud operations for customers
 
-    public boolean createCustomer(Customer customer) {
-        return persistence.createCustomer(customer);
+    public String createCustomer(Customer customer) {
+        String error = "";
+        boolean confirm = false;
+        try {
+            confirm = persistence.createCustomer(customer);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (confirm) {
+            return "valido";
+        }
+        if (persistence.existEmail(customer.getEmail())) {
+            return "El huesped con E-mail " + customer.getEmail() + "\nYA EXISTE.";
+        }
+        return error;
     }
 
     public String updateCustomer(Customer customer) {
@@ -137,6 +150,17 @@ public class BookingSystem {
         }
     }
 
+    public boolean hasActiveBookingForCustomer(String customerId) {
+        return persistence.hasActiveBookingForCustomer(customerId);
+    }
+
+    public void deactivateBookingsEndingToday() {
+        for (Booking booking : persistence.findActiveBookingsWithCheckOutToday()) {
+            booking.setActive(false);
+            updateBooking(booking);
+        }
+    }
+
     public List<Booking> findAllBookings() {
         return persistence.findAllBookings();
     }
@@ -150,7 +174,7 @@ public class BookingSystem {
     }
 
     public int getNextBookingId() {
-        return persistence.countBookings();
+        return persistence.countBookings() + 1;
     }
 
 }

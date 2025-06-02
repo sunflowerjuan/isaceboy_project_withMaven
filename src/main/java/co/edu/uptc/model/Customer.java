@@ -14,6 +14,7 @@ public class Customer implements Serializable {
     private String name;
     private String lastName;
     private String address;
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
     private String phoneNumber;
     private double balance;

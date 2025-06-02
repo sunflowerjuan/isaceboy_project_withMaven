@@ -131,6 +131,31 @@ public class BookingJpaController implements Serializable {
         }
     }
 
+    public List<Booking> findActiveBookingsWithCheckOutToday() {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT b FROM Booking b WHERE b.isActive = true AND b.endDate = :today";
+            return em.createQuery(jpql, Booking.class)
+                    .setParameter("today", new Date(), TemporalType.DATE)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean hasActiveBookingForCustomer(String customerId) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(b) FROM Booking b WHERE b.customer.identification = :customerId AND b.isActive = true";
+            Long count = em.createQuery(jpql, Long.class)
+                    .setParameter("customerId", customerId)
+                    .getSingleResult();
+            return count > 0;
+        } finally {
+            em.close();
+        }
+    }
+
     public int getBookingCount() {
         EntityManager em = getEntityManager();
         try {
@@ -139,6 +164,17 @@ public class BookingJpaController implements Serializable {
             cq.select(em.getCriteriaBuilder().count(rt));
             javax.persistence.Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    public int findMaxBookingId() {
+        EntityManager em = getEntityManager();
+        try {
+            Integer maxId = em.createQuery("SELECT MAX(b.bookingId) FROM Booking b", Integer.class)
+                    .getSingleResult();
+            return maxId != null ? maxId : 0;
         } finally {
             em.close();
         }

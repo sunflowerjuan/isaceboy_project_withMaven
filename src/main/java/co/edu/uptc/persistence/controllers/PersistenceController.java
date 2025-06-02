@@ -23,12 +23,8 @@ public class PersistenceController {
     // CRUD operations for Customer
 
     public boolean createCustomer(Customer customer) {
-        try {
-            customerJpaController.create(customer);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        customerJpaController.create(customer);
+        return true;
     }
 
     public void updateCustomer(Customer customer) throws Exception {
@@ -50,6 +46,10 @@ public class PersistenceController {
 
     public int countCustomers() {
         return customerJpaController.getCustomerCount();
+    }
+
+    public boolean existEmail(String email) {
+        return customerJpaController.emailExists(email);
     }
 
     // CRUD operations for Room
@@ -91,6 +91,7 @@ public class PersistenceController {
             bookingJpaController.create(booking);
             return true;
         } catch (Exception e) {
+
             return false;
         }
     }
@@ -108,6 +109,10 @@ public class PersistenceController {
         return true;
     }
 
+    public boolean hasActiveBookingForCustomer(String id) {
+        return bookingJpaController.hasActiveBookingForCustomer(id);
+    }
+
     public List<Booking> findAllBookings() {
         return bookingJpaController.findBookingEntities();
     }
@@ -116,8 +121,12 @@ public class PersistenceController {
         return bookingJpaController.findBookingsByRoomType(roomType);
     }
 
+    public List<Booking> findActiveBookingsWithCheckOutToday() {
+        return bookingJpaController.findActiveBookingsWithCheckOutToday();
+    }
+
     public int countBookings() {
-        return bookingJpaController.getBookingCount();
+        return bookingJpaController.findMaxBookingId();
     }
 
 }

@@ -33,7 +33,8 @@ public class CustomerJpaController implements Serializable {
             em.persist(customer);
             em.getTransaction().commit();
         } catch (Exception e) {
-            throw new EntityExistsException("The customer with id " + customer.getIdentification() + " alredy exists.");
+            throw new EntityExistsException(
+                    "El huesped con cedula " + customer.getIdentification() + "\nYA EXISTE.");
         } finally {
             if (em != null) {
                 em.close();
@@ -126,6 +127,19 @@ public class CustomerJpaController implements Serializable {
             cq.select(em.getCriteriaBuilder().count(rt));
             javax.persistence.Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean emailExists(String email) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(c) FROM Customer c WHERE c.email = :email";
+            Long count = em.createQuery(jpql, Long.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+            return count > 0;
         } finally {
             em.close();
         }

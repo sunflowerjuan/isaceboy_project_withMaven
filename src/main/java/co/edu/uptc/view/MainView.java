@@ -28,6 +28,7 @@ public class MainView {
     private Stage stage;
     private Tooltip toggleTooltip;
 
+    private WelcomePane welcomePane;
     private BookingPane bookingPane;
     private ShowBookingPane showBookingPane;
     private CustomerPane customerPane;
@@ -47,6 +48,7 @@ public class MainView {
     }
 
     public void initComponets() {
+        welcomePane = new WelcomePane(); // nuevo
         bookingPane = new BookingPane(presenter, stage);
         showBookingPane = new ShowBookingPane(presenter, stage);
         customerPane = new CustomerPane(presenter, stage);
@@ -55,13 +57,14 @@ public class MainView {
     }
 
     public void setupView() {
+        initComponets();
         // Barra superior
         WindowControlsPane windowControlsPane = new WindowControlsPane(stage);
         root.setTop(windowControlsPane);
         // Centro inicial
-        root.setCenter(new Label("Bienvenido"));
+        root.setCenter(welcomePane);
         menu.setOnPanelSelected(panel -> root.setCenter(panel));
-        initComponets();
+
         // Pestaña para mostrar/ocultar menú
         createToggleTab();
         root.setLeft(new HBox(menu.getMenu(), toggleTab));

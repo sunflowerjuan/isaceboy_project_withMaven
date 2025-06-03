@@ -1,7 +1,5 @@
 package co.edu.uptc.view;
 
-import co.edu.uptc.view.customer.CustomerPane;
-import co.edu.uptc.view.room.RoomPane;
 import co.edu.uptc.view.rootstyles.DialogMessage;
 import co.edu.uptc.view.rootstyles.ViewStyles;
 import javafx.geometry.Insets;

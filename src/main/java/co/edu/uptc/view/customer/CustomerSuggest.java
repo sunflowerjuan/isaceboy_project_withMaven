@@ -1,3 +1,5 @@
+// CustomerSuggest.java
+
 package co.edu.uptc.view.customer;
 
 import co.edu.uptc.presenter.Presenter;
@@ -19,7 +21,7 @@ public class CustomerSuggest extends HBox {
     private TextField searchField;
     private VBox listBox;
     private TextField idField, nameField, lastNameField, addressField, emailField, phoneField;
-    private Label nameError, lastNameError, emailError, phoneError;
+    private Label nameError, lastNameError, emailError, phoneError, addresError;
     private Button editButton, deleteButton, updateButton;
     private Presenter presenter;
     private Stage stage;
@@ -51,6 +53,7 @@ public class CustomerSuggest extends HBox {
 
         nameError = createErrorLabel();
         lastNameError = createErrorLabel();
+        addresError = createErrorLabel();
         emailError = createErrorLabel();
         phoneError = createErrorLabel();
 
@@ -58,6 +61,7 @@ public class CustomerSuggest extends HBox {
         validationMap.put(lastNameField, lastNameError);
         validationMap.put(emailField, emailError);
         validationMap.put(phoneField, phoneError);
+        validationMap.put(addressField, addresError);
 
         editButton = new Button("Editar");
         deleteButton = new Button("Eliminar");
@@ -114,7 +118,7 @@ public class CustomerSuggest extends HBox {
         formGrid.add(fieldBox("Nombre:", nameField, nameError), 1, row++);
 
         formGrid.add(fieldBox("Apellido:", lastNameField, lastNameError), 0, row);
-        formGrid.add(fieldBox("Dirección:", addressField, null), 1, row++);
+        formGrid.add(fieldBox("Dirección:", addressField, addresError), 1, row++);
 
         formGrid.add(fieldBox("Email:", emailField, emailError), 0, row);
         formGrid.add(fieldBox("Teléfono:", phoneField, phoneError), 1, row++);
@@ -168,20 +172,46 @@ public class CustomerSuggest extends HBox {
             if (!e.getCharacter().matches("[a-zA-ZáéíóúÁÉÍÓÚ\\s]"))
                 e.consume();
         });
+
         lastNameField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
             if (!e.getCharacter().matches("[a-zA-ZáéíóúÁÉÍÓÚ\\s]"))
                 e.consume();
         });
+
+        // TELÉFONO: solo 10 dígitos + formato en vivo
         phoneField.addEventFilter(KeyEvent.KEY_TYPED, e -> {
-            if (!e.getCharacter().matches("[0-9\\s]"))
+            String character = e.getCharacter();
+            String currentText = phoneField.getText().replaceAll("\\D", "");
+            if (!character.matches("\\d") || currentText.length() >= 10) {
                 e.consume();
+            }
         });
 
+        phoneField.textProperty().addListener((obs, oldText, newText) -> {
+            String digitsOnly = newText.replaceAll("\\D", "");
+            if (digitsOnly.length() > 10) {
+                digitsOnly = digitsOnly.substring(0, 10);
+            }
+
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digitsOnly.length(); i++) {
+                if (i == 3 || i == 6 || i == 8) {
+                    formatted.append(" ");
+                }
+                formatted.append(digitsOnly.charAt(i));
+            }
+
+            if (!phoneField.getText().equals(formatted.toString())) {
+                phoneField.setText(formatted.toString());
+                phoneField.positionCaret(formatted.length());
+            }
+
+            validateField(phoneField); // actualiza errores en vivo
+        });
+
+        // Validación en vivo
         for (TextField field : validationMap.keySet()) {
-            field.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                if (!newVal)
-                    validateField(field);
-            });
+            field.textProperty().addListener((obs, oldVal, newVal) -> validateField(field));
         }
 
         editButton.setOnAction(e -> {
@@ -211,7 +241,6 @@ public class CustomerSuggest extends HBox {
                     if (confirm) {
                         DialogMessage.showInfoDialog(stage, "Usuario eliminado correctamente.");
                         clearForm();
-
                     } else {
                         DialogMessage.showErrorDialog(stage,
                                 "Operacion Fallida.\n Verifique que no tenga reservas asociadas.");
@@ -243,15 +272,23 @@ public class CustomerSuggest extends HBox {
 
     private boolean validateField(TextField field) {
         Label errorLabel = validationMap.get(field);
-        boolean isValid = !field.getText().trim().isEmpty();
-        if (field == emailField)
-            isValid = field.getText().matches("^.+@.+\\..+$");
-        if (!isValid) {
-            errorLabel.setText("Campo inválido o vacío");
-            errorLabel.setVisible(true);
-        } else {
-            errorLabel.setVisible(false);
+        String value = field.getText().trim();
+        boolean isValid = !value.isEmpty();
+
+        if (field == emailField) {
+            isValid = value.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+            if (!isValid)
+                errorLabel.setText("Correo inválido");
+        } else if (field == phoneField) {
+            String digits = value.replaceAll("\\D", "");
+            isValid = digits.matches("\\d{10}");
+            if (!isValid)
+                errorLabel.setText("El teléfono debe tener 10 dígitos");
+        } else if (!isValid) {
+            errorLabel.setText("Campo obligatorio");
         }
+
+        errorLabel.setVisible(!isValid);
         return isValid;
     }
 
@@ -320,9 +357,21 @@ public class CustomerSuggest extends HBox {
         lastNameField.setText(customerData[2]);
         addressField.setText(customerData[3]);
         emailField.setText(customerData[4]);
-        phoneField.setText(customerData[5]);
+        phoneField.setText(formatPhone(customerData[5]));
         setEditableFields(false);
         updateButton.setDisable(true);
+    }
+
+    private String formatPhone(String raw) {
+        String digits = raw.replaceAll("\\D", "");
+        StringBuilder formatted = new StringBuilder();
+        for (int i = 0; i < digits.length(); i++) {
+            if (i == 3 || i == 6 || i == 8) {
+                formatted.append(" ");
+            }
+            formatted.append(digits.charAt(i));
+        }
+        return formatted.toString();
     }
 
     public void clearForm() {
@@ -333,6 +382,12 @@ public class CustomerSuggest extends HBox {
         emailField.clear();
         phoneField.clear();
         searchField.clear();
+
+        // Ocultar todos los errores de validación
+        for (Label errorLabel : validationMap.values()) {
+            errorLabel.setVisible(false);
+        }
+
         setEditableFields(false);
         updateButton.setDisable(true);
         updateSuggestions("");
@@ -345,7 +400,7 @@ public class CustomerSuggest extends HBox {
                 lastNameField.getText().trim(),
                 addressField.getText().trim(),
                 emailField.getText().trim(),
-                phoneField.getText().trim()
+                phoneField.getText().replaceAll("\\D", "") // guarda sin espacios
         };
     }
 }

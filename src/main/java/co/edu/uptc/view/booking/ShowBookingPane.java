@@ -16,11 +16,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
-// ... imports sin cambios
+import java.util.Locale;
 
 public class ShowBookingPane extends HBox {
     private Presenter presenter;
@@ -36,6 +36,7 @@ public class ShowBookingPane extends HBox {
     private Button updateBtn, cancelBtn, editBtn;
 
     private Label guestTitleLabel, guestInfoLabel, idTitleLabel, idInfoLabel;
+    private Label totalPriceTitleLabel, totalPriceValueLabel;
 
     private String currentBookingId;
 
@@ -52,7 +53,7 @@ public class ShowBookingPane extends HBox {
     }
 
     private void initComponents() {
-        // Calendario (sin cambios)
+        // Calendario
         calendarView = new CalendarView();
         calendarView.setShowAddCalendarButton(false);
         calendarView.setShowPrintButton(false);
@@ -102,6 +103,11 @@ public class ShowBookingPane extends HBox {
         idInfoLabel = new Label();
         ViewStyles.labelTextStyle(idInfoLabel);
 
+        totalPriceTitleLabel = new Label("Valor Total:");
+        ViewStyles.formLabelStyle(totalPriceTitleLabel);
+        totalPriceValueLabel = new Label("$0");
+        ViewStyles.labelTextStyle(totalPriceValueLabel);
+
         roomTypeBox = new ComboBox<>();
         roomTypeBox.getItems().addAll(presenter.getRoomTypes());
         ViewStyles.comboStyle(roomTypeBox);
@@ -112,10 +118,9 @@ public class ShowBookingPane extends HBox {
                 String[] roomInfo = presenter.getRoomInfo(selected);
                 if (roomInfo == null) {
                     checkInPicker.setDisable(true);
+                    checkOutPicker.setDisable(true);
                     checkInPicker.setValue(null);
-                    checkInPicker.setDisable(true);
-                    checkInPicker.setValue(null);
-
+                    checkOutPicker.setValue(null);
                     DialogMessage.showWarningDialog(stage,
                             "No hay información disponible para el tipo de habitación seleccionado.");
                 } else {
@@ -126,16 +131,23 @@ public class ShowBookingPane extends HBox {
                         checkOutPicker.setDisable(true);
                     }
                 }
+                updateTotalPrice(); // actualizar valor total si cambia tipo habitación
             }
         });
 
         checkInPicker = new DatePicker();
         checkInPicker.setDayCellFactory(getAvailableCheckOutDates(roomTypeBox.getValue(), LocalDate.now()));
-        checkInPicker.setOnAction(e -> updateCheckOutAvailability());
+        checkInPicker.setOnAction(e -> {
+            updateCheckOutAvailability();
+            updateTotalPrice();
+        });
         checkInPicker.setDisable(true);
 
         checkOutPicker = new DatePicker();
         checkOutPicker.setDisable(true);
+        checkOutPicker.setOnAction(e -> {
+            updateTotalPrice();
+        });
 
         updateBtn = new Button("Actualizar Reserva");
         cancelBtn = new Button("Eliminar");
@@ -147,7 +159,7 @@ public class ShowBookingPane extends HBox {
         cancelBtn.setPrefWidth(100);
         ViewStyles.buttonStyle(editBtn, 100, 50);
 
-        disableForm(true); // Deshabilitar por defecto
+        disableForm(true);
 
         setListeners();
     }
@@ -169,6 +181,7 @@ public class ShowBookingPane extends HBox {
                 createLabeledField("Tipo de habitación", roomTypeBox),
                 createLabeledField("Fecha de Entrada", checkInPicker),
                 createLabeledField("Fecha de Salida", checkOutPicker),
+                createLabeledField("Valor total", totalPriceValueLabel),
                 createButtonRow());
         formGrid.setAlignment(Pos.TOP_LEFT);
 
@@ -190,9 +203,8 @@ public class ShowBookingPane extends HBox {
         buttonBox.setPadding(new Insets(100, 0, 0, 0));
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Listener para cambiar a vertical si el espacio horizontal es insuficiente
         buttonBox.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            if (newWidth.doubleValue() < 400) { // puedes ajustar este umbral
+            if (newWidth.doubleValue() < 400) {
                 buttonBox.setSpacing(5);
                 buttonBox.setPadding(new Insets(50, 0, 0, 0));
                 buttonBox.getChildren().setAll(new VBox(10, editBtn, cancelBtn, updateBtn));
@@ -228,7 +240,6 @@ public class ShowBookingPane extends HBox {
             return null;
         });
         calendarView.setEntryContextMenuCallback(param -> new ContextMenu());
-
     }
 
     private void fillForm(String[] bookingData) {
@@ -242,6 +253,7 @@ public class ShowBookingPane extends HBox {
         checkInPicker.setValue(LocalDate.parse(bookingData[3]));
         checkOutPicker.setValue(LocalDate.parse(bookingData[4]));
         roomTypeBox.setValue(presenter.roomTypeFromString(bookingData[2]));
+        totalPriceValueLabel.setText(formatPrice(Double.parseDouble(bookingData[5])));
 
         disableForm(true);
         updateBtn.setDisable(true);
@@ -287,7 +299,6 @@ public class ShowBookingPane extends HBox {
             } else {
                 DialogMessage.showErrorDialog(stage, result);
             }
-
         });
 
         cancelBtn.setOnAction(e -> {
@@ -299,21 +310,19 @@ public class ShowBookingPane extends HBox {
                 return;
             }
             if (presenter.hasActiveBooking(currentBookingId)) {
-                DialogMessage.showConfirmDialog(stage, "¿Esta seguro que desea eliminar la reserva actual?", () -> {
+                DialogMessage.showConfirmDialog(stage, "¿Está seguro que desea eliminar la reserva actual?", () -> {
                     boolean success = presenter.cancelBooking(currentBookingId);
                     if (success) {
                         DialogMessage.showInfoDialog(stage, "Reserva eliminada correctamente.");
                         clearForm();
                         loadBookings();
                     } else {
-                        DialogMessage.showErrorDialog(stage,
-                                "Operacion Fallida.\n Reserva Inactiva.");
+                        DialogMessage.showErrorDialog(stage, "Operación fallida.\nReserva inactiva.");
                     }
                 });
             } else {
                 DialogMessage.showErrorDialog(stage, "No se puede eliminar una reserva inactiva.");
             }
-
         });
     }
 
@@ -323,6 +332,7 @@ public class ShowBookingPane extends HBox {
         roomTypeBox.setValue(null);
         checkInPicker.setValue(null);
         checkOutPicker.setValue(null);
+        totalPriceValueLabel.setText("$0");
         editingMode = false;
         disableForm(true);
         updateBtn.setDisable(true);
@@ -338,7 +348,20 @@ public class ShowBookingPane extends HBox {
             checkOutPicker.setDisable(false);
             checkOutPicker.setValue(null);
             checkOutPicker.setDayCellFactory(getAvailableCheckOutDates(roomType, checkIn));
+        }
+    }
 
+    private void updateTotalPrice() {
+        if (roomTypeBox.getValue() != null && checkInPicker.getValue() != null && checkOutPicker.getValue() != null) {
+            long nights = checkInPicker.getValue().until(checkOutPicker.getValue()).getDays();
+            if (nights > 0) {
+                int price = (int) presenter.calculateBookingPrice(roomTypeBox.getValue(), nights);
+                totalPriceValueLabel.setText(formatPrice(price));
+            } else {
+                totalPriceValueLabel.setText("$0");
+            }
+        } else {
+            totalPriceValueLabel.setText("$0");
         }
     }
 
@@ -359,10 +382,9 @@ public class ShowBookingPane extends HBox {
                     return;
                 }
 
-                // Verificar si hay al menos una fecha continua posterior disponible para salir
                 boolean hasAvailableRange = false;
                 LocalDate nextDate = date.plusDays(1);
-                for (int i = 0; i < 30; i++) { // Máximo 30 días de búsqueda
+                for (int i = 0; i < 30; i++) {
                     if (!unavailableDates.contains(nextDate)) {
                         hasAvailableRange = true;
                         break;
@@ -383,7 +405,7 @@ public class ShowBookingPane extends HBox {
                 ? presenter.getUnavailableDates(roomType, Integer.parseInt(currentBookingId))
                 : presenter.getUnavailableDates(roomType);
 
-        LocalDate maxCheckOut = checkInDate.plusDays(20); // Límite máximo de 20 días
+        LocalDate maxCheckOut = checkInDate.plusDays(20);
 
         return datePicker -> new DateCell() {
             @Override
@@ -397,7 +419,6 @@ public class ShowBookingPane extends HBox {
                     LocalDate cursor = checkInDate;
                     boolean available = true;
 
-                    // Verifica disponibilidad en el rango
                     while (!cursor.isEqual(date)) {
                         if (unavailableDates.contains(cursor)) {
                             available = false;
@@ -410,7 +431,7 @@ public class ShowBookingPane extends HBox {
                         setDisable(true);
                         setStyle("-fx-background-color: #ffc0cb;");
                     } else {
-                        setStyle("-fx-background-color: #c8e6c9;"); // verde claro
+                        setStyle("-fx-background-color: #c8e6c9;");
                     }
                 }
             }
@@ -420,6 +441,11 @@ public class ShowBookingPane extends HBox {
     private boolean isBookingInProgress(LocalDate checkIn, LocalDate checkOut) {
         LocalDate today = LocalDate.now();
         return today.isAfter(checkIn) && today.isBefore(checkOut);
+    }
+
+    private String formatPrice(double price) {
+        NumberFormat format = NumberFormat.getNumberInstance(new Locale("es", "CO"));
+        return "$" + format.format(price);
     }
 
 }

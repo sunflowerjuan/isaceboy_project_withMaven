@@ -48,7 +48,7 @@ public class CustomerPane extends VBox {
         formGrid.setAlignment(Pos.BOTTOM_CENTER);
 
         int row = 0;
-        formGrid.add(createFieldWithError("Cédula:", idField, idError = new Label()), 0, row);
+        formGrid.add(createFieldWithError("Documento de identidad:", idField, idError = new Label()), 0, row);
         formGrid.add(createFieldWithError("Nombre:", nameField, nameError = new Label()), 1, row++);
 
         formGrid.add(createFieldWithError("Apellido:", lastNameField, lastNameError = new Label()), 0, row);

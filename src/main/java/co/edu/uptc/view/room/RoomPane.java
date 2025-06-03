@@ -52,7 +52,7 @@ public class RoomPane extends VBox {
         int row = 0;
         grid.add(createComboWithLabel("Tipo de habitación:", roomTypeCombo), 0, row++);
         grid.add(createFieldWithLabel("Cantidad:", roomCountField), 0, row++);
-        grid.add(createFieldWithError("Precio por Día:", priceField, priceError = new Label()), 0, row++);
+        grid.add(createFieldWithError("Precio por Noche:", priceField, priceError = new Label()), 0, row++);
 
         VBox container = new VBox(20);
         container.setAlignment(Pos.TOP_CENTER);

@@ -93,7 +93,7 @@ public class BookingPane extends VBox {
                 + " -fx-background-radius: 5;"
                 + " -fx-padding: 5;"
                 + " -fx-font-size: 16px;");
-        searchCustomerField.setPromptText("Buscar por cédula");
+        searchCustomerField.setPromptText("Documento de identidad");
         searchCustomerField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
                 searchCustomerField.setText(newVal.replaceAll("[^\\d]", ""));
@@ -166,7 +166,7 @@ public class BookingPane extends VBox {
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER_LEFT);
 
-        Label searchLabel = new Label("Buscar por cédula:");
+        Label searchLabel = new Label("Buscar por Documento:");
 
         searchLabel.setLabelFor(searchCustomerField);
 
@@ -204,7 +204,7 @@ public class BookingPane extends VBox {
             String customerId = selected.substring(selected.lastIndexOf("-") + 2);
             String[] data = presenter.getCustomerDataById(customerId);
             if (data != null) {
-                idLabel.setText("Cédula: " + data[0]);
+                idLabel.setText("Documento de identidad: " + data[0]);
                 nameLabel.setText("Nombre: " + data[1] + " " + data[2]);
                 emailLabel.setText("Correo: " + data[4]);
                 updateBookingSummary();

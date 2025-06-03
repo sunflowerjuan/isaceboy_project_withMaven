@@ -80,7 +80,7 @@ public class CustomerSuggest extends HBox {
         Label titleRight = new Label("Búsqueda de usuarios");
         titleRight.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Label searchLabel = new Label("Buscar por cédula:");
+        Label searchLabel = new Label("Buscar por Documento:");
         searchLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
         VBox searchBox = new VBox(5, searchLabel, searchField);
@@ -110,7 +110,7 @@ public class CustomerSuggest extends HBox {
         formGrid.setAlignment(Pos.TOP_CENTER);
 
         int row = 0;
-        formGrid.add(fieldBox("Cédula:", idField, null), 0, row);
+        formGrid.add(fieldBox("Documento de Identidad:", idField, null), 0, row);
         formGrid.add(fieldBox("Nombre:", nameField, nameError), 1, row++);
 
         formGrid.add(fieldBox("Apellido:", lastNameField, lastNameError), 0, row);
@@ -206,14 +206,17 @@ public class CustomerSuggest extends HBox {
 
         deleteButton.setOnAction(e -> {
             if (areFieldsFilled()) {
-                boolean confirm = presenter.deleteCustomer(idField.getText());
-                if (confirm) {
-                    DialogMessage.showInfoDialog(stage, "Usuario eliminado correctamente.");
-                    clearForm();
-                } else {
-                    DialogMessage.showErrorDialog(stage,
-                            "Operacion Fallida.\n Verifique que no tenga reservas asociadas.");
-                }
+                DialogMessage.showConfirmDialog(stage, "¿Esta seguro que desea eliminar el huesped actual?", () -> {
+                    boolean confirm = presenter.deleteCustomer(idField.getText());
+                    if (confirm) {
+                        DialogMessage.showInfoDialog(stage, "Usuario eliminado correctamente.");
+                        clearForm();
+
+                    } else {
+                        DialogMessage.showErrorDialog(stage,
+                                "Operacion Fallida.\n Verifique que no tenga reservas asociadas.");
+                    }
+                });
             } else {
                 DialogMessage.showErrorDialog(stage, "CAMPOS VACIOS\nDebe seleccionar un usuario antes de eliminarlo.");
             }
@@ -294,7 +297,7 @@ public class CustomerSuggest extends HBox {
             nameLabel.setStyle(
                     "-fx-font-weight: bold; -fx-font-size: 14px;-fx-text-fill: " + ViewStyles.PRIMARY_COLOR + ";");
 
-            Label idLabel = new Label("Cédula: " + customer[0]);
+            Label idLabel = new Label("Documento de Identidad: " + customer[0]);
             idLabel.setStyle("-fx-text-fill: #555555;");
 
             customerCard.getChildren().addAll(nameLabel, idLabel);

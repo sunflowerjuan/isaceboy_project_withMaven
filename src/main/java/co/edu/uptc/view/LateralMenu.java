@@ -80,11 +80,17 @@ public class LateralMenu {
         createBooking.setOnAction(e -> {
             notifyChange(mainView.getBookingPane());
             mainView.getCustomerPane().setFromReservation(false);
+            mainView.getBookingPane().clean();
         });
 
         Button showBooking = new Button("Ver Reservas");
         ViewStyles.buttonStyle(showBooking);
-        showBooking.setOnAction(e -> notifyChange(mainView.getShowBookingPane()));
+        showBooking.setOnAction(e -> {
+            notifyChange(mainView.getShowBookingPane());
+            mainView.getShowBookingPane().clearForm();
+            mainView.getShowBookingPane().loadBookings();
+            toggleVisibility();
+        });
 
         VBox reservasBox = new VBox(5, createBooking, showBooking);
         TitledPane pane = new TitledPane("Reservas", reservasBox);

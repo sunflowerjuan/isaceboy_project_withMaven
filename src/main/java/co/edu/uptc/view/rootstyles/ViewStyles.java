@@ -50,6 +50,10 @@ public class ViewStyles {
                                 + " -fx-font-weight: bold;");
         }
 
+        public static void labelTextStyle(Label label) {
+                label.setStyle("-fx-text-fill: " + ViewStyles.BLACK_COLOR + ";" + " -fx-font-size: 18px;");
+        }
+
         // Labels generales (formularios)
         public static void formLabelStyle(Label label) {
                 label.setStyle("-fx-text-fill: " + PRIMARY_COLOR + ";"

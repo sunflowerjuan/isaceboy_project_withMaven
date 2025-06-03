@@ -41,4 +41,9 @@ public class DateUtil {
         return localDate.format(formatter);
     }
 
+    public static long getDaysBetween(LocalDate checkIn, LocalDate checkOut) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDaysBetween'");
+    }
+
 }

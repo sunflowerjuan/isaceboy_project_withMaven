@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +17,6 @@ import co.edu.uptc.model.Room;
 import co.edu.uptc.model.RoomType;
 import co.edu.uptc.utils.DateUtil;
 import co.edu.uptc.view.MainView;
-import javafx.scene.Node;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.util.Callback;
 
 public class Presenter {
 
@@ -154,67 +149,34 @@ public class Presenter {
         return unavailableDates;
     }
 
-    public Callback<DatePicker, DateCell> getAvailableCheckInDates(RoomType roomType) {
-        List<LocalDate> unavailableDates = getUnavailableDates(roomType);
-        LocalDate today = LocalDate.now();
+    public List<LocalDate> getUnavailableDates(RoomType roomType, int excludeBookingId) {
+        List<Booking> bookings = bookingSystem.getBookingsByRoomType(roomType);
+        Map<LocalDate, Integer> dateCountMap = new HashMap<>();
 
-        return datePicker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
+        Room room = bookingSystem.findRoom(roomType);
+        int totalRooms = room != null ? room.getNumberOfRooms() : 0;
 
-                if (empty || date.isBefore(today) || unavailableDates.contains(date)) {
-                    setDisable(true);
-                    setStyle("-fx-background-color: #ffc0cb;");
-                    return;
-                }
-
-                // Verificar si hay al menos una fecha continua posterior disponible para salir
-                boolean hasAvailableRange = false;
-                LocalDate nextDate = date.plusDays(1);
-                for (int i = 0; i < 30; i++) { // Máximo 30 días de búsqueda
-                    if (!unavailableDates.contains(nextDate)) {
-                        hasAvailableRange = true;
-                        break;
-                    }
-                    nextDate = nextDate.plusDays(1);
-                }
-
-                if (!hasAvailableRange) {
-                    setDisable(true);
-                    setStyle("-fx-background-color: #ffc0cb;");
-                }
+        for (Booking booking : bookings) {
+            if (!booking.isActive() || booking.getBookingId() == excludeBookingId) {
+                continue;
             }
-        };
-    }
 
-    public Callback<DatePicker, DateCell> getAvailableCheckOutDates(RoomType roomType, LocalDate checkInDate) {
-        List<LocalDate> unavailableDates = getUnavailableDates(roomType);
-        return datePicker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                if (empty || date.isBefore(checkInDate.plusDays(1))) {
-                    setDisable(true);
-                } else {
-                    LocalDate cursor = checkInDate;
-                    boolean available = true;
-                    while (!cursor.isEqual(date)) {
-                        if (unavailableDates.contains(cursor)) {
-                            available = false;
-                            break;
-                        }
-                        cursor = cursor.plusDays(1);
-                    }
-                    if (!available || unavailableDates.contains(date)) {
-                        setDisable(true);
-                        setStyle("-fx-background-color: #ffc0cb;");
-                    } else {
-                        setStyle("-fx-background-color: #c8e6c9;"); // verde claro
-                    }
-                }
+            LocalDate start = DateUtil.toLocalDate(booking.getStartDate());
+            LocalDate end = DateUtil.toLocalDate(booking.getEndDate());
+
+            for (LocalDate date = start; !date.isAfter(end.minusDays(1)); date = date.plusDays(1)) {
+                dateCountMap.put(date, dateCountMap.getOrDefault(date, 0) + 1);
             }
-        };
+        }
+
+        List<LocalDate> unavailableDates = new ArrayList<>();
+        for (Map.Entry<LocalDate, Integer> entry : dateCountMap.entrySet()) {
+            if (entry.getValue() >= totalRooms) {
+                unavailableDates.add(entry.getKey());
+            }
+        }
+
+        return unavailableDates;
     }
 
     public String[] getCustomerDataById(String selected) {
@@ -279,9 +241,63 @@ public class Presenter {
         return bookingSystem.findBookingsByCustomerId(query);
     }
 
-    public Booking getBookingByCustomerId(String customerId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBookingByCustomerId'");
+    public List<String[]> getAllBookings() {
+        List<String[]> results = new ArrayList<>();
+        for (Booking booking : bookingSystem.findAllBookings()) {
+            String[] bookingData = new String[6];
+            bookingData[0] = String.valueOf(booking.getBookingId());
+            bookingData[1] = booking.getCustomer().getIdentification();
+            bookingData[2] = booking.getRoom().getRoomType().toString();
+            bookingData[3] = DateUtil.toLocalDate(booking.getStartDate()).toString();
+            bookingData[4] = DateUtil.toLocalDate(booking.getEndDate()).toString();
+            bookingData[5] = String.valueOf(booking.getTotalPrice());
+            results.add(bookingData);
+        }
+        return results;
     }
 
+    public String updateBooking(String[] strings) {
+        if (strings.length < 4) {
+            return "Datos incompletos para actualizar la reserva.";
+        }
+        int bookingId = Integer.parseInt(strings[0]);
+        RoomType roomType = RoomType.valueOf(strings[1]);
+        LocalDate checkIn = LocalDate.parse(strings[2]);
+        LocalDate checkOut = LocalDate.parse(strings[3]);
+
+        Booking booking = bookingSystem.findBooking(bookingId);
+        if (booking == null) {
+            return "Reserva no encontrada.";
+        }
+
+        Room room = bookingSystem.findRoom(roomType);
+
+        booking.setRoom(room);
+        booking.setStartDate(Date.from(checkIn.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        booking.setEndDate(Date.from(checkOut.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        booking.setTotalPrice(calculateBookingPrice(roomType, DateUtil.getDaysBetween(checkIn, checkOut)));
+
+        return bookingSystem.updateBooking(booking);
+    }
+
+    public boolean cancelBooking(String currentBookingId) {
+        return bookingSystem.deleteBooking(Integer.parseInt(currentBookingId));
+    }
+
+    public RoomType roomTypeFromString(String roomType) {
+        switch (roomType) {
+            case "DOBLE":
+                return RoomType.DOBLE;
+            case "TRIPLE":
+                return RoomType.TRIPLE;
+            case "CUADRUPLE":
+                return RoomType.CUADRUPLE;
+            case "QUINTUPLE":
+                return RoomType.QUINTUPLE;
+            case "CABAÑA":
+                return RoomType.CABAÑA;
+            default:
+                throw new IllegalArgumentException("Tipo de habitación desconocido: " + roomType);
+        }
+    }
 }

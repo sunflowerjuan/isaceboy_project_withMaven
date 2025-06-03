@@ -6,14 +6,12 @@ import java.util.List;
 import co.edu.uptc.persistence.controllers.PersistenceController;
 
 public class BookingSystem {
-    private List<Booking> bookings;
-    private List<Customer> customers;
+
     private PersistenceController persistence;
 
     public BookingSystem() {
         this.persistence = new PersistenceController();
-        this.bookings = new ArrayList<>();
-        this.customers = new ArrayList<>();
+        inicializeRooms();
     }
 
     // Crud operations for customers
@@ -49,8 +47,7 @@ public class BookingSystem {
     }
 
     public List<Customer> findAllCustomers() {
-        customers = persistence.findAllCustomers();
-        return customers;
+        return persistence.findAllCustomers();
     }
 
     public List<Customer> findCustomersByIdPartial(String query) {
@@ -183,6 +180,16 @@ public class BookingSystem {
 
     public List<Booking> findBookingsByCustomerId(String query) {
         return persistence.findBookingsByCustomerId(query);
+    }
+
+    public void inicializeRooms() {
+        if (persistence.countRooms() == 0) {
+            persistence.createRoom(new Room(0, RoomType.DOBLE, 4, 180000));
+            persistence.createRoom(new Room(1, RoomType.TRIPLE, 10, 270000));
+            persistence.createRoom(new Room(2, RoomType.CUADRUPLE, 1, 360000));
+            persistence.createRoom(new Room(3, RoomType.QUINTUPLE, 1, 450000));
+            persistence.createRoom(new Room(4, RoomType.CABAÑA, 6, 540000));
+        }
     }
 
 }

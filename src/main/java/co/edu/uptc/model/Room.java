@@ -16,6 +16,13 @@ public class Room implements Serializable {
     private int numberOfRooms;
     private double pricePerNight;
 
+    public Room(int id, RoomType roomType, int numberOfRooms, double pricePerNight) {
+        this.id = id;
+        this.roomType = roomType;
+        this.numberOfRooms = numberOfRooms;
+        this.pricePerNight = pricePerNight;
+    }
+
     public Room() {
     }
 

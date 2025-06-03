@@ -382,15 +382,22 @@ public class ShowBookingPane extends HBox {
         List<LocalDate> unavailableDates = editingMode && currentBookingId != null
                 ? presenter.getUnavailableDates(roomType, Integer.parseInt(currentBookingId))
                 : presenter.getUnavailableDates(roomType);
+
+        LocalDate maxCheckOut = checkInDate.plusDays(20); // Límite máximo de 20 días
+
         return datePicker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                if (empty || date.isBefore(checkInDate.plusDays(1))) {
+
+                if (empty || date.isBefore(checkInDate.plusDays(1)) || date.isAfter(maxCheckOut)) {
                     setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;");
                 } else {
                     LocalDate cursor = checkInDate;
                     boolean available = true;
+
+                    // Verifica disponibilidad en el rango
                     while (!cursor.isEqual(date)) {
                         if (unavailableDates.contains(cursor)) {
                             available = false;
@@ -398,6 +405,7 @@ public class ShowBookingPane extends HBox {
                         }
                         cursor = cursor.plusDays(1);
                     }
+
                     if (!available || unavailableDates.contains(date)) {
                         setDisable(true);
                         setStyle("-fx-background-color: #ffc0cb;");

@@ -112,6 +112,25 @@ public class ViewStyles {
                 button.setCursor(javafx.scene.Cursor.HAND);
         }
 
+        // Botones modales
+        public static void buttonStyleModal(Button button) {
+                button.setStyle("-fx-background-color: " + PRIMARY_COLOR + ";"
+                                + " -fx-text-fill: " + LIGTH_TEXT + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;");
+                button.setPrefHeight(40);
+                button.setMaxWidth(Double.MAX_VALUE);
+
+                button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: " + THIRD_COLOR + ";"
+                                + " -fx-text-fill: " + PRIMARY_COLOR + ";"
+                                + " -fx-font-size: 15px;"
+                                + " -fx-font-weight: bold;"
+                                + " -fx-background-radius: 10;"));
+                button.setOnMouseExited(e -> buttonStyleModal(button));
+                button.setCursor(javafx.scene.Cursor.HAND);
+        }
+
         public static void buttonStyle(Button button, int widthValue, int heightValue) {
                 button.setStyle("-fx-background-color: " + SECONDARY_COLOR + ";"
                                 + " -fx-text-fill: " + LIGTH_TEXT + ";"

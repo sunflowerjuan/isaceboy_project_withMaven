@@ -324,26 +324,30 @@ public class BookingPane extends VBox {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                if (empty || date.isBefore(checkInDate.plusDays(1))) {
+
+                if (empty || date.isBefore(checkInDate.plusDays(1)) || date.isAfter(checkInDate.plusDays(20))) {
                     setDisable(true);
+                    return;
+                }
+
+                LocalDate cursor = checkInDate;
+                boolean available = true;
+                while (!cursor.isEqual(date)) {
+                    if (unavailableDates.contains(cursor)) {
+                        available = false;
+                        break;
+                    }
+                    cursor = cursor.plusDays(1);
+                }
+
+                if (!available || unavailableDates.contains(date)) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;"); // rojo claro
                 } else {
-                    LocalDate cursor = checkInDate;
-                    boolean available = true;
-                    while (!cursor.isEqual(date)) {
-                        if (unavailableDates.contains(cursor)) {
-                            available = false;
-                            break;
-                        }
-                        cursor = cursor.plusDays(1);
-                    }
-                    if (!available || unavailableDates.contains(date)) {
-                        setDisable(true);
-                        setStyle("-fx-background-color: #ffc0cb;");
-                    } else {
-                        setStyle("-fx-background-color: #c8e6c9;"); // verde claro
-                    }
+                    setStyle("-fx-background-color: #c8e6c9;"); // verde claro
                 }
             }
         };
     }
+
 }

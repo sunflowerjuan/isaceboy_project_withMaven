@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.effect.DropShadow;
@@ -33,10 +35,9 @@ public class CustomDialog {
         VBox contentBox = new VBox(20);
         contentBox.setPadding(new Insets(20));
         contentBox.setAlignment(Pos.CENTER);
-        contentBox.setStyle("-fx-background-color: " + ViewStyles.PRIMARY_COLOR + ";" +
+        contentBox.setStyle("-fx-background-color: " + ViewStyles.SECONDARY_COLOR + ";" +
                 "-fx-border-color:rgb(0, 0, 0);");
 
-        // Aplicar sombra
         DropShadow shadow = new DropShadow();
         shadow.setRadius(10);
         shadow.setColor(Color.color(0, 0, 0, 0.4));
@@ -65,28 +66,25 @@ public class CustomDialog {
             dialogStage.setY(newY);
         });
 
-        // Etiqueta
         Label messageLabel = new Label(message);
         messageLabel.setWrapText(true);
-        messageLabel.setMaxWidth(360); // <- evita desbordes horizontales
-        messageLabel.setMinHeight(100);
+        messageLabel.setMaxWidth(360); // Limita el ancho
         ViewStyles.subtitleStyle(messageLabel);
         messageLabel.setStyle(messageLabel.getStyle() + "-fx-text-fill: white; -fx-font-size: 18px;");
 
-        // Ícono
+        HBox iconBox = new HBox();
         if (icon != null) {
             icon.setFitHeight(100);
             icon.setPreserveRatio(true);
-        }
-        HBox iconBox = new HBox();
-        if (icon != null) {
             iconBox.getChildren().add(icon);
             iconBox.setAlignment(Pos.CENTER);
+            contentBox.getChildren().add(iconBox);
         }
 
-        // Botones
         Button acceptBtn = new Button("Aceptar");
-        ViewStyles.buttonStyle(acceptBtn);
+        acceptBtn.setMinHeight(40); // Más alto
+        acceptBtn.setPadding(new Insets(10, 20, 10, 20));
+        ViewStyles.buttonStyleModal(acceptBtn);
         acceptBtn.setOnAction(e -> {
             if (onAccept != null)
                 onAccept.run();
@@ -94,7 +92,9 @@ public class CustomDialog {
         });
 
         Button cancelBtn = new Button("Cancelar");
-        ViewStyles.buttonStyle(cancelBtn);
+        cancelBtn.setMinHeight(40);
+        cancelBtn.setPadding(new Insets(10, 20, 10, 20));
+        ViewStyles.buttonStyleModal(cancelBtn);
         cancelBtn.setOnAction(e -> dialogStage.close());
 
         HBox buttonBox = new HBox(15, acceptBtn);
@@ -102,14 +102,20 @@ public class CustomDialog {
             buttonBox.getChildren().add(cancelBtn);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Estructura
-        if (icon != null)
-            contentBox.getChildren().add(iconBox);
         contentBox.getChildren().addAll(messageLabel, buttonBox);
 
-        Scene scene = new Scene(contentBox, 500, 300);
+        Scene scene = new Scene(contentBox);
         scene.setFill(Color.TRANSPARENT);
+
+        // Permitir cerrar con ESC
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                dialogStage.close();
+            }
+        });
+
         dialogStage.setScene(scene);
+        dialogStage.sizeToScene(); // Ajustar automáticamente el tamaño al contenido
     }
 
     public void show() {

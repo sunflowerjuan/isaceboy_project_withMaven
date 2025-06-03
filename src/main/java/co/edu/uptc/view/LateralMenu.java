@@ -8,7 +8,18 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Consumer;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class LateralMenu {
 
@@ -133,11 +144,32 @@ public class LateralMenu {
     private Button createManualButton() {
         Button manualBtn = new Button("Manual de Usuario");
         ViewStyles.buttonStyle(manualBtn, 50);
-        manualBtn.setOnAction(e -> {
-            DialogMessage.showInfoDialog(mainView.getStage(), "Manual de Usuario\n" +
-                    "El manual de usuario está disponible en la carpeta del proyecto, en la ruta: src/main/resources/manual.pdf");
-        });
+        manualBtn.setOnAction(e -> openManual());
         return manualBtn;
+    }
+
+    private void openManual() {
+        try {
+            // Cargar el recurso desde el classpath
+            InputStream inputStream = getClass().getResourceAsStream("/doc/manual.pdf");
+            if (inputStream == null) {
+                DialogMessage.showErrorDialog(mainView.getStage(), "No se encontró el archivo manual.pdf");
+                return;
+            }
+
+            // Crear un archivo temporal
+            File tempFile = File.createTempFile("manual", ".pdf");
+            tempFile.deleteOnExit();
+
+            // Copiar el contenido del recurso al archivo temporal
+            Files.copy(inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            // Abrir el archivo con el visor por defecto
+            Desktop.getDesktop().open(tempFile);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            DialogMessage.showErrorDialog(mainView.getStage(), "No se pudo abrir el manual de usuario.");
+        }
     }
 
     private Button createCloseButton() {

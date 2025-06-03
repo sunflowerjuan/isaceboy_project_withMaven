@@ -44,6 +44,7 @@ public class BookingPane extends VBox {
 
     private void initComponents() {
         roomTypeBox = new ComboBox<>();
+        ViewStyles.comboStyle(roomTypeBox);
         roomTypeBox.setPrefWidth(300);
         roomTypeBox.getItems().addAll(presenter.getRoomTypes());
         roomTypeBox.setOnAction(e -> {
@@ -86,6 +87,12 @@ public class BookingPane extends VBox {
         checkOutDate.setOnAction(e -> updateBookingSummary());
 
         searchCustomerField = new TextField();
+        searchCustomerField.setStyle("-fx-background-color: fafafa;"
+                + " -fx-border-color: " + ViewStyles.ENABLE_COLOR + ";"
+                + " -fx-border-radius: 5;"
+                + " -fx-background-radius: 5;"
+                + " -fx-padding: 5;"
+                + " -fx-font-size: 16px;");
         searchCustomerField.setPromptText("Buscar por cédula");
         searchCustomerField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*")) {
@@ -99,6 +106,7 @@ public class BookingPane extends VBox {
         customerSuggestions.setOnMouseClicked(e -> loadCustomerData());
 
         registerCustomerBtn = new Button("Registrar huésped");
+        ViewStyles.buttonStyle(registerCustomerBtn, 200, 40);
         registerCustomerBtn.setDisable(true);
         registerCustomerBtn.setOnAction(e -> presenter.showCustomerForm(searchCustomerField.getText().trim()));
 
@@ -115,7 +123,6 @@ public class BookingPane extends VBox {
 
     private void createLayout() {
         Label title = new Label("CREAR RESERVA");
-        title.setStyle("-fx-font-size: 50px; -fx-font-weight: bold;");
         ViewStyles.titleStyle(title, 1);
         title.setPadding(new Insets(30, 10, 40, 20));
 
@@ -134,7 +141,7 @@ public class BookingPane extends VBox {
 
     private VBox createSection(String subtitle, Node content) {
         Label label = new Label(subtitle);
-        label.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        ViewStyles.formLabelStyle(label);
         return new VBox(10, label, content);
     }
 
@@ -160,6 +167,7 @@ public class BookingPane extends VBox {
         vbox.setAlignment(Pos.CENTER_LEFT);
 
         Label searchLabel = new Label("Buscar por cédula:");
+
         searchLabel.setLabelFor(searchCustomerField);
 
         HBox searchBox = new HBox(10, searchLabel, searchCustomerField, registerCustomerBtn);
@@ -171,7 +179,7 @@ public class BookingPane extends VBox {
 
     private VBox createBookingSummary() {
         Label summaryTitle = new Label("Resumen:");
-        summaryTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        summaryTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
         return new VBox(10, summaryTitle, nightsLabel, totalPriceLabel);
     }
 

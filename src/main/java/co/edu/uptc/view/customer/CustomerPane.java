@@ -99,7 +99,12 @@ public class CustomerPane extends VBox {
                 }
                 clearForm();
             } else {
-                DialogMessage.showWarningDialog(stage, "RELLENE TODOS LOS CAMPOS PRIMERO");
+                if (!validateBlankFields()) {
+                    DialogMessage.showWarningDialog(stage, "RELLENE LOS CAMPOS VACIOS");
+                } else {
+                    DialogMessage.showWarningDialog(stage, "RELLENE LOS CAMPOS EN EL FORMATO CORRECTO");
+
+                }
             }
         });
     }
@@ -107,8 +112,8 @@ public class CustomerPane extends VBox {
     public void idField() {
         idField = createTextField();
         idField.textProperty().addListener((obs, oldVal, newVal) -> {
-            newVal = newVal.replaceAll("[^\\d]", "");
-            idField.setText(formatId(newVal));
+            newVal = newVal.replaceAll("[^\\d]", ""); // Solo números
+            idField.setText(newVal); // Sin puntos
             if (!newVal.isBlank())
                 idError.setVisible(false);
         });
@@ -199,6 +204,12 @@ public class CustomerPane extends VBox {
         return isValid;
     }
 
+    private boolean validateBlankFields() {
+        return !idField.getText().isBlank() && !nameField.getText().isBlank() &&
+                !lastNameField.getText().isBlank() && !addressField.getText().isBlank() &&
+                !emailField.getText().isBlank() && !phoneField.getText().isBlank();
+    }
+
     private boolean validateFields() {
         boolean valid = true;
 
@@ -242,16 +253,6 @@ public class CustomerPane extends VBox {
             phoneError.setVisible(false);
 
         return valid;
-    }
-
-    private String formatId(String raw) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < raw.length(); i++) {
-            if (i > 0 && (raw.length() - i) % 3 == 0)
-                result.append(".");
-            result.append(raw.charAt(i));
-        }
-        return result.toString();
     }
 
     private String formatPhone(String raw) {

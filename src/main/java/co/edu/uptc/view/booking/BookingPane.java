@@ -66,7 +66,7 @@ public class BookingPane extends VBox {
                     checkInDate.setValue(null);
                     checkOutDate.setValue(null);
                     checkOutDate.setDisable(true);
-                    registerCustomerBtn.setDisable(false);
+                    registerCustomerBtn.setDisable(true);
                 }
             }
         });

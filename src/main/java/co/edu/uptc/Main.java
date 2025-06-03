@@ -12,7 +12,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.getIcons().add(new Image("file:src/main/resources/images/IASCEBOY.jpg"));
+        primaryStage.getIcons().add(new Image(getClass().getResource("/images/IASCEBOY.jpg").toExternalForm()));
 
         MainView mainView = new MainView(primaryStage);
         Presenter controller = new Presenter(mainView);

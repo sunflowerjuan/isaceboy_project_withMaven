@@ -52,7 +52,7 @@ public class LateralMenu {
     }
 
     private VBox createHeader() {
-        ImageView logoView = new ImageView(new Image("file:src/main/resources/images/logo.png"));
+        ImageView logoView = new ImageView(new Image(getClass().getResource("/images/logo.png").toExternalForm()));
         logoView.setFitHeight(150);
         logoView.setPreserveRatio(true);
 

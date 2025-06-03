@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 public class DialogMessage {
 
-    private static final String ICON_PATH_BASE = "file:src/main/resources/images/dialog/";
+    private static final String ICON_PATH_BASE = "/images/dialog/";
 
     private DialogMessage() {
     }
@@ -43,9 +43,11 @@ public class DialogMessage {
 
     private static ImageView loadIcon(String fileName) {
         try {
-            return new ImageView(new Image(ICON_PATH_BASE + fileName));
+            return new ImageView(
+                    new Image(DialogMessage.class.getResource(ICON_PATH_BASE + fileName).toExternalForm()));
         } catch (Exception e) {
             return null;
         }
     }
+
 }

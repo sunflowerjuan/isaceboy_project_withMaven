@@ -14,7 +14,7 @@ public class WelcomePane extends VBox {
         this.setSpacing(20);
         this.setPadding(new Insets(50));
 
-        ImageView logo = new ImageView(new Image("file:src/main/resources/images/logo.png"));
+        ImageView logo = new ImageView(new Image(getClass().getResource("/images/logo.png").toExternalForm()));
         logo.setFitHeight(400);
         logo.setPreserveRatio(true);
 

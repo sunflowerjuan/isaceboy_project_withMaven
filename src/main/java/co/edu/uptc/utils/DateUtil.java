@@ -42,8 +42,10 @@ public class DateUtil {
     }
 
     public static long getDaysBetween(LocalDate checkIn, LocalDate checkOut) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDaysBetween'");
+        if (checkIn == null || checkOut == null) {
+            throw new IllegalArgumentException("Las fechas no pueden ser nulas");
+        }
+        return java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
     }
 
 }

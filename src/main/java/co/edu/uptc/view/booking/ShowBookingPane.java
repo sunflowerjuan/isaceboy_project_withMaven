@@ -56,7 +56,7 @@ public class ShowBookingPane extends HBox {
         calendarView = new CalendarView();
         calendarView.setShowAddCalendarButton(false);
         calendarView.setShowPrintButton(false);
-        calendarView.setShowSearchField(false);
+        calendarView.setShowSearchField(true);
         calendarView.setShowPageSwitcher(false);
         calendarView.setRequestedTime(LocalTime.now());
         calendarView.setPrefWidth(950);
@@ -138,8 +138,8 @@ public class ShowBookingPane extends HBox {
         checkOutPicker.setDisable(true);
 
         updateBtn = new Button("Actualizar Reserva");
-        cancelBtn = new Button("Cancelar");
-        editBtn = new Button("Editar");
+        cancelBtn = new Button("Eliminar");
+        editBtn = new Button("Modificar");
 
         ViewStyles.buttonStyle(updateBtn, 100, 50);
         updateBtn.setMinWidth(150);
@@ -227,9 +227,12 @@ public class ShowBookingPane extends HBox {
             fillForm(bookingData);
             return null;
         });
+        calendarView.setEntryContextMenuCallback(param -> new ContextMenu());
+
     }
 
     private void fillForm(String[] bookingData) {
+        clearForm();
         currentBookingId = bookingData[0];
         String[] customerData = presenter.getCustomerDataById(bookingData[1]);
 
@@ -252,10 +255,22 @@ public class ShowBookingPane extends HBox {
 
     private void setListeners() {
         editBtn.setOnAction(e -> {
-            editingMode = true;
-            disableForm(false);
-            editingDatePicker(roomTypeBox.getValue());
-            updateBtn.setDisable(false);
+            LocalDate checkIn = checkInPicker.getValue();
+            LocalDate checkOut = checkOutPicker.getValue();
+
+            if (isBookingInProgress(checkIn, checkOut)) {
+                DialogMessage.showErrorDialog(stage, "No se puede modificar una reserva en proceso.");
+                return;
+            }
+
+            if (presenter.hasActiveBooking(currentBookingId)) {
+                editingMode = true;
+                disableForm(false);
+                editingDatePicker(roomTypeBox.getValue());
+                updateBtn.setDisable(false);
+            } else {
+                DialogMessage.showErrorDialog(stage, "No se puede modificar una reserva inactiva.");
+            }
         });
 
         updateBtn.setOnAction(e -> {
@@ -276,20 +291,29 @@ public class ShowBookingPane extends HBox {
         });
 
         cancelBtn.setOnAction(e -> {
-            DialogMessage.showConfirmDialog(stage, "¿Esta seguro que desea eliminar la reserva actual?", () -> {
-                boolean success = presenter.cancelBooking(currentBookingId);
-                if (success) {
-                    DialogMessage.showInfoDialog(stage, "Reserva eliminada correctamente.");
-                    clearForm();
-                    loadBookings();
-                } else {
-                    DialogMessage.showErrorDialog(stage,
-                            "Operacion Fallida.\n Reserva Inactiva.");
-                }
-            });
+            LocalDate checkIn = checkInPicker.getValue();
+            LocalDate checkOut = checkOutPicker.getValue();
 
-            clearForm();
-            loadBookings();
+            if (isBookingInProgress(checkIn, checkOut)) {
+                DialogMessage.showErrorDialog(stage, "No se puede eliminar una reserva en proceso.");
+                return;
+            }
+            if (presenter.hasActiveBooking(currentBookingId)) {
+                DialogMessage.showConfirmDialog(stage, "¿Esta seguro que desea eliminar la reserva actual?", () -> {
+                    boolean success = presenter.cancelBooking(currentBookingId);
+                    if (success) {
+                        DialogMessage.showInfoDialog(stage, "Reserva eliminada correctamente.");
+                        clearForm();
+                        loadBookings();
+                    } else {
+                        DialogMessage.showErrorDialog(stage,
+                                "Operacion Fallida.\n Reserva Inactiva.");
+                    }
+                });
+            } else {
+                DialogMessage.showErrorDialog(stage, "No se puede eliminar una reserva inactiva.");
+            }
+
         });
     }
 
@@ -299,11 +323,12 @@ public class ShowBookingPane extends HBox {
         roomTypeBox.setValue(null);
         checkInPicker.setValue(null);
         checkOutPicker.setValue(null);
-
+        editingMode = false;
         disableForm(true);
         updateBtn.setDisable(true);
         cancelBtn.setDisable(true);
         editBtn.setDisable(true);
+        calendarView.getSearchField().setText("");
     }
 
     private void updateCheckOutAvailability() {
@@ -382,6 +407,11 @@ public class ShowBookingPane extends HBox {
                 }
             }
         };
+    }
+
+    private boolean isBookingInProgress(LocalDate checkIn, LocalDate checkOut) {
+        LocalDate today = LocalDate.now();
+        return today.isAfter(checkIn) && today.isBefore(checkOut);
     }
 
 }

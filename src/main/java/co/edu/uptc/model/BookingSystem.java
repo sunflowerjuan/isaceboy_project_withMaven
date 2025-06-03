@@ -1,9 +1,11 @@
 package co.edu.uptc.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.uptc.persistence.controllers.PersistenceController;
+import co.edu.uptc.utils.DateUtil;
 
 public class BookingSystem {
 
@@ -155,13 +157,6 @@ public class BookingSystem {
         return persistence.hasActiveBookingForCustomer(customerId);
     }
 
-    public void deactivateBookingsEndingToday() {
-        for (Booking booking : persistence.findActiveBookingsWithCheckOutToday()) {
-            booking.setActive(false);
-            updateBooking(booking);
-        }
-    }
-
     public List<Booking> findAllBookings() {
         return persistence.findAllBookings();
     }
@@ -182,6 +177,17 @@ public class BookingSystem {
         return persistence.findBookingsByCustomerId(query);
     }
 
+    public void deactiveBookings() {
+        for (Booking booking : persistence.findActiveBookingsWithCheckOutToday()) {
+            booking.setActive(false);
+            try {
+                persistence.updateBooking(booking);
+            } catch (Exception e) {
+                System.err.println("Error al desactivar la reserva: " + e.getMessage());
+            }
+        }
+    }
+
     public void inicializeRooms() {
         if (persistence.countRooms() == 0) {
             persistence.createRoom(new Room(0, RoomType.DOBLE, 4, 180000));
@@ -190,6 +196,12 @@ public class BookingSystem {
             persistence.createRoom(new Room(3, RoomType.QUINTUPLE, 1, 450000));
             persistence.createRoom(new Room(4, RoomType.CABAÑA, 6, 540000));
         }
+        deactiveBookings();
+    }
+
+    public boolean hasActiveBooking(int bookingId) {
+        Booking booking = persistence.findBooking(bookingId);
+        return booking != null && booking.isActive();
     }
 
 }

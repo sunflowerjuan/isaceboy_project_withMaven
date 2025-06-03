@@ -284,6 +284,10 @@ public class Presenter {
         return bookingSystem.deleteBooking(Integer.parseInt(currentBookingId));
     }
 
+    public boolean hasActiveBooking(String booking) {
+        return bookingSystem.hasActiveBooking(Integer.parseInt(booking));
+    }
+
     public RoomType roomTypeFromString(String roomType) {
         switch (roomType) {
             case "DOBLE":

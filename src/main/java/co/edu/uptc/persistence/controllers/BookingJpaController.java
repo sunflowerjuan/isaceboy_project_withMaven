@@ -134,7 +134,7 @@ public class BookingJpaController implements Serializable {
     public List<Booking> findActiveBookingsWithCheckOutToday() {
         EntityManager em = getEntityManager();
         try {
-            String jpql = "SELECT b FROM Booking b WHERE b.isActive = true AND b.endDate = :today";
+            String jpql = "SELECT b FROM Booking b WHERE b.isActive = true AND b.endDate <= :today";
             return em.createQuery(jpql, Booking.class)
                     .setParameter("today", new Date(), TemporalType.DATE)
                     .getResultList();

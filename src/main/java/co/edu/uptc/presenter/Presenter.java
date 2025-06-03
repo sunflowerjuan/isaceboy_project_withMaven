@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import co.edu.uptc.model.Room;
 import co.edu.uptc.model.RoomType;
 import co.edu.uptc.utils.DateUtil;
 import co.edu.uptc.view.MainView;
+import javafx.scene.Node;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.util.Callback;
@@ -263,6 +265,23 @@ public class Presenter {
         mainView.notifyChange(mainView.getBookingPane());
         mainView.getBookingPane().loadCustomerData();
         mainView.getBookingPane().updateSuggestions(customerId);
+    }
+
+    public boolean deleteBooking(int bookingId) {
+        return bookingSystem.deleteBooking(bookingId);
+    }
+
+    public List<Booking> getBookingsByDate(LocalDate selectedDate) {
+        return bookingSystem.findAllBookings();
+    }
+
+    public List<Booking> findBookingsByCustomerId(String query) {
+        return bookingSystem.findBookingsByCustomerId(query);
+    }
+
+    public Booking getBookingByCustomerId(String customerId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getBookingByCustomerId'");
     }
 
 }

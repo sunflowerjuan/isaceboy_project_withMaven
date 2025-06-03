@@ -48,7 +48,7 @@ public class MainView {
 
     public void initComponets() {
         bookingPane = new BookingPane(presenter, stage);
-        showBookingPane = new ShowBookingPane();
+        showBookingPane = new ShowBookingPane(presenter, stage);
         customerPane = new CustomerPane(presenter, stage);
         customerSuggestPane = new CustomerSuggest(presenter, stage);
         roomPane = new RoomPane(presenter, stage);

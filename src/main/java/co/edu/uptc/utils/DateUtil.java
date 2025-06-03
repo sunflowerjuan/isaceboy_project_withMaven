@@ -33,4 +33,12 @@ public class DateUtil {
         }
     }
 
+    public static String format(Date date) {
+        if (date == null)
+            return "";
+        LocalDate localDate = toLocalDate(date);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return localDate.format(formatter);
+    }
+
 }

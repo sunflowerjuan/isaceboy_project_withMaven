@@ -181,4 +181,8 @@ public class BookingSystem {
         return persistence.countBookings() + 1;
     }
 
+    public List<Booking> findBookingsByCustomerId(String query) {
+        return persistence.findBookingsByCustomerId(query);
+    }
+
 }

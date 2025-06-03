@@ -143,6 +143,18 @@ public class BookingJpaController implements Serializable {
         }
     }
 
+    public List<Booking> findBookingsByCustomerIdentificationLike(String query) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT b FROM Booking b WHERE b.customer.identification LIKE :query";
+            return em.createQuery(jpql, Booking.class)
+                    .setParameter("query", "%" + query + "%")
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
     public boolean hasActiveBookingForCustomer(String customerId) {
         EntityManager em = getEntityManager();
         try {

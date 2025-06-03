@@ -125,6 +125,10 @@ public class PersistenceController {
         return bookingJpaController.findActiveBookingsWithCheckOutToday();
     }
 
+    public List<Booking> findBookingsByCustomerId(String query) {
+        return bookingJpaController.findBookingsByCustomerIdentificationLike(query);
+    }
+
     public int countBookings() {
         return bookingJpaController.findMaxBookingId();
     }

@@ -57,6 +57,11 @@ public class ViewStyles {
                                 + " -fx-font-weight: bold;");
         }
 
+        public static void formSubLabelStyle(Label label) {
+                label.setStyle("-fx-text-fill: " + BLACK_COLOR + ";"
+                                + " -fx-font-size: 14px;");
+        }
+
         // Estilo para campos de texto
         public static void textFieldStyle(TextField field) {
                 field.setStyle("-fx-background-color: fafafa;"

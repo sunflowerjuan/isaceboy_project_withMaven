@@ -15,14 +15,14 @@ public class WelcomePane extends VBox {
         this.setPadding(new Insets(50));
 
         ImageView logo = new ImageView(new Image("file:src/main/resources/images/logo.png"));
-        logo.setFitHeight(200);
+        logo.setFitHeight(400);
         logo.setPreserveRatio(true);
 
         Label title = new Label("BIENVENIDO");
-        title.setStyle("-fx-font-size: 36px; -fx-text-fill: #333; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 50px; -fx-text-fill: #333; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Para navegar, use las opciones del menú lateral");
-        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: #666;");
+        subtitle.setStyle("-fx-font-size: 20px; -fx-text-fill: #666;");
 
         this.getChildren().addAll(logo, title, subtitle);
     }
